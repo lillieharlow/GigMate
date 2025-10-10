@@ -1,3 +1,6 @@
+"""Utility module for common constraints and validation patterns to be used across models and schemas.
+Maintains consistency, reusability, maintainability and scalability."""
+
 # Phone regex for phone number validation
 phone_regex = r'^\+?[0-9]{10,15}$'
 phone_validation_error = "Phone number must contain 10-15 digits, area code '+' accepted."
