@@ -28,7 +28,7 @@ Who’s GigMate For?
    * [Install Dependencies](#install-dependencies)
    * [Set Up PostgreSQL](#set-up-postgresql)
    * [Create User & Grant Permissions](#create-user--grant-permissions)
-   * [Create `.env` and `.flaskenv` files](#create-env-and-flaskenv-files)
+   * [Create `.env` file](#create-env-file)
    * [Run the API](#run-the-api)
 * [Hardware Requirements](#hardware-requirements)
 * [Dependencies](#dependencies)
@@ -114,15 +114,9 @@ GigMate runs on macOS, Linux and Windows (WSL). For development, Python 3.8+ is 
    \q
    ```
 
-### Create `.env` and `.flaskenv` files
+### Create `.env` file
    Create your own `.env` file and define your DATABASE_URI.
    See `.env.example` DATABASE_URI example
-   
-   Create your own `.flaskenv` file and define:
-   ```bash
-   FLASK_APP = main
-   FLASK_DEBUG = 1
-   ```
 
 ### Run the API
 Drop, create and seed demo data from `cli_controller`.
