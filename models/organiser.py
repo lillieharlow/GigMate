@@ -1,7 +1,7 @@
-from init import db
 from sqlalchemy import CheckConstraint
 
-from utils.constraints import FULL_NAME_MAX, EMAIL_MAX, PHONE_MAX
+from init import db
+from utils.constraints import FULL_NAME_MAX, EMAIL_MAX, PHONE_MAX, email_regex, phone_regex, name_regex
 
 class Organiser(db.Model):
     __tablename__ = "organisers"
@@ -14,7 +14,9 @@ class Organiser(db.Model):
         events (list): List of events associated with the organiser.
     """
     __table_args__ = (
-        CheckConstraint("length(phone_number) <= 15", name = 'check_phone_number_max_length'),
+        CheckConstraint(f"email ~ '{email_regex}'", name = 'check_email_format'), # Validate email format
+        CheckConstraint(f"phone_number ~ '{phone_regex}'", name = 'check_phone_format'), # Validate phone number format  
+        CheckConstraint(f"full_name ~ '{name_regex}'", name = 'check_full_name_format'), # Validate full name format
     )
     organiser_id = db.Column(db.Integer, primary_key = True)
     full_name = db.Column(db.String(FULL_NAME_MAX), nullable = False)
@@ -23,4 +25,4 @@ class Organiser(db.Model):
 
     """Relationship: one organiser can organise many events.
     Delete behaviour: if an organiser is deleted, their events remain but organiser_id is set to NULL."""
-    events = db.relationship("Event", back_populates = "organiser")
+    events = db.relationship("Event", back_populates = "organiser", passive_deletes=True)
