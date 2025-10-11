@@ -1,6 +1,7 @@
-from init import db
 from sqlalchemy import CheckConstraint
-from utils.constraints import FIRST_NAME_MAX, LAST_NAME_MAX, EMAIL_MAX, PHONE_MAX
+
+from init import db
+from utils.constraints import FIRST_NAME_MAX, LAST_NAME_MAX, EMAIL_MAX, PHONE_MAX, email_regex, phone_regex, name_regex
 
 class TicketHolder(db.Model):
     __tablename__ = "ticket_holders"
@@ -14,7 +15,10 @@ class TicketHolder(db.Model):
         bookings (list): List of bookings associated with the ticket holder.
     """
     __table_args__ = (
-        CheckConstraint("length(phone_number) <= 15", name = 'check_phone_number_max_length'),
+        CheckConstraint(f"email ~ '{email_regex}'", name = 'check_email_format'), # Validate email format
+        CheckConstraint(f"phone_number ~ '{phone_regex}'", name = 'check_phone_format'), # Validate phone number format
+        CheckConstraint(f"first_name ~ '{name_regex}'", name = 'check_first_name_format'), # Validate first name format
+        CheckConstraint(f"last_name ~ '{name_regex}'", name = 'check_last_name_format'), # Validate last name format
     )
     ticket_holder_id = db.Column(db.Integer, primary_key = True)
     first_name = db.Column(db.String(FIRST_NAME_MAX), nullable = False)
@@ -23,5 +27,5 @@ class TicketHolder(db.Model):
     phone_number = db.Column(db.String(PHONE_MAX), nullable = False, unique = True)
 
     """Relationship: one ticket holder can have many bookings.
-    Cascade: if a ticket holder is deleted, all their bookings are also deleted."""
-    bookings = db.relationship("Booking", back_populates = "ticket_holder", cascade = "all, delete-orphan")
+    Delete behaviour: ticket holders cannot be deleted if they have future confirmed bookings."""
+    bookings = db.relationship("Booking", back_populates = "ticket_holder")
