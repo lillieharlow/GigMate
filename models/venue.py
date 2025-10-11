@@ -1,6 +1,7 @@
-from init import db
 from sqlalchemy import CheckConstraint
-from utils.constraints import VENUE_NAME_MAX
+
+from init import db
+from utils.constraints import VENUE_NAME_MAX, VENUE_LOCATION_MAX, name_regex, address_regex
 
 
 class Venue(db.Model):
@@ -9,19 +10,22 @@ class Venue(db.Model):
     Attributes:
         venue_id (int): Primary key.
         name (str): Name of the venue.
-        location (str): Location of the venue.
+        location (str): Full address of the venue (e.g., "11 The Esplanade, St Kilda VIC 3182").
         capacity (int): Capacity of the venue.
         shows (list): List of shows associated with the venue.
     """
     __table_args__ = (
         CheckConstraint("capacity >= 1", name='check_capacity_positive'),
+        CheckConstraint("capacity <= 200000", name='check_capacity_realistic'), # Max realistic venue capacity
+        CheckConstraint(f"name ~ '{name_regex}'", name='check_name_format'), # Validate venue name format
+        CheckConstraint(f"location ~ '{address_regex}'", name='check_address_format'), # Validate Google Maps style address
     )
 
     venue_id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(VENUE_NAME_MAX), nullable = False, unique = True)
-    location = db.Column(db.String(100), nullable = False)
+    location = db.Column(db.String(VENUE_LOCATION_MAX), nullable = False)
     capacity = db.Column(db.Integer, nullable = False)
 
     """Relationship: one venue can host many shows.
-    Delete behaviour: if a venue is deleted, the shows remain. Placeholder attributes are added via 'add_venue_fallback' in schema.py"""
+    Delete behaviour: venues with scheduled shows cannot be deleted (RESTRICT)."""
     shows = db.relationship("Show", back_populates = "venue")
