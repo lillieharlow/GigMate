@@ -13,6 +13,10 @@ email_validation_error = "Invalid email format. Expected name@domain.com"
 name_regex = r"^[A-Za-z]([A-Za-z\s\-'\.]*[A-Za-z])?$"
 name_validation_error = "Name only accepts letters, spaces, hyphens, and apostrophes. Can't be just whitespace or contain any numbers."
 
+# Venue title regex - allows letters, numbers, spaces, hyphens, apostrophes, ampersands
+venue_title_regex = r"^[A-Za-z0-9]([A-Za-z0-9\s\-'\.&]*[A-Za-z0-9])?$"
+venue_title_validation_error = "Venue title can only contain letters, numbers, spaces, hyphens, apostrophes, and ampersands."
+
 # Address regex for Google Maps style validation - optional street number, location name, suburb, state, postcode
 address_regex = r"^([0-9]+[A-Za-z]?\s+)?[A-Za-z\s\-'\.]+,\s*[A-Za-z\s\-'\.]+\s+[A-Z]{2,3}\s+[0-9]{4}$"
 address_validation_error = "Address must follow Google Maps style: 'Number (optional) Location Name, Suburb/City STATE POSTCODE'"
