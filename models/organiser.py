@@ -1,6 +1,7 @@
 from sqlalchemy import CheckConstraint
 
 from init import db
+from utils.constraints import email_regex, phone_regex, name_regex
 
 class Organiser(db.Model):
     __tablename__ = "organisers"
