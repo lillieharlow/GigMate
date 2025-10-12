@@ -1,8 +1,6 @@
 from sqlalchemy import CheckConstraint
 
 from init import db
-from utils.constraints import EVENT_TITLE_MAX
-
 
 class Event(db.Model):
     __tablename__ = "events"
@@ -21,7 +19,7 @@ class Event(db.Model):
     )
 
     event_id = db.Column(db.Integer, primary_key = True)
-    title = db.Column(db.String(EVENT_TITLE_MAX), nullable = False)
+    title = db.Column(db.String(100), nullable = False)
     description = db.Column(db.Text)
     duration_hours = db.Column(db.Float, nullable = False)
     organiser_id = db.Column(db.Integer, db.ForeignKey("organisers.organiser_id", ondelete = "SET NULL"), nullable = True)

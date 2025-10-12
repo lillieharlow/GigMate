@@ -1,7 +1,6 @@
 from sqlalchemy import CheckConstraint
 
 from init import db
-from utils.constraints import FIRST_NAME_MAX, LAST_NAME_MAX, EMAIL_MAX, PHONE_MAX, email_regex, phone_regex, name_regex
 
 class TicketHolder(db.Model):
     __tablename__ = "ticket_holders"
@@ -21,10 +20,10 @@ class TicketHolder(db.Model):
         CheckConstraint(f"last_name ~ '{name_regex}'", name = 'check_last_name_format'), # Validate last name format
     )
     ticket_holder_id = db.Column(db.Integer, primary_key = True)
-    first_name = db.Column(db.String(FIRST_NAME_MAX), nullable = False)
-    last_name = db.Column(db.String(LAST_NAME_MAX), nullable = False)
-    email = db.Column(db.String(EMAIL_MAX), nullable = False, unique = True)
-    phone_number = db.Column(db.String(PHONE_MAX), nullable = False, unique = True)
+    first_name = db.Column(db.String(20), nullable = False)
+    last_name = db.Column(db.String(30), nullable = False)
+    email = db.Column(db.String(100), nullable = False, unique = True)
+    phone_number = db.Column(db.String(15), nullable = False, unique = True)
 
     """Relationship: one ticket holder can have many bookings.
     Delete behaviour: ticket holders cannot be deleted if they have future confirmed bookings."""

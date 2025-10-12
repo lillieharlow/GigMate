@@ -1,8 +1,6 @@
 from sqlalchemy import CheckConstraint
 
 from init import db
-from utils.constraints import VENUE_NAME_MAX, VENUE_LOCATION_MAX, name_regex, address_regex
-
 
 class Venue(db.Model):
     __tablename__ = "venues"
@@ -22,8 +20,8 @@ class Venue(db.Model):
     )
 
     venue_id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(VENUE_NAME_MAX), nullable = False, unique = True)
-    location = db.Column(db.String(VENUE_LOCATION_MAX), nullable = False)
+    name = db.Column(db.String(30), nullable = False, unique = True)
+    location = db.Column(db.String(100), nullable = False)
     capacity = db.Column(db.Integer, nullable = False)
 
     """Relationship: one venue can host many shows.

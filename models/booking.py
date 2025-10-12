@@ -4,7 +4,6 @@ from sqlalchemy import func
 from sqlalchemy.types import Enum
 
 from init import db
-from utils.constraints import SEAT_MAX, DATE_DISPLAY_FORMAT
 
 # Define set values for booking_status column of booking table.
 class BookingStatus(enum.Enum):
@@ -41,7 +40,7 @@ class Booking(db.Model):
     booking_date = db.Column(db.Date, default = func.current_date(), nullable = False)  # Use DATE_DISPLAY_FORMAT for serialization
     booking_status = db.Column(Enum(BookingStatus), nullable = False, default = BookingStatus.CONFIRMED)
     section = db.Column(Enum(Section), nullable = False, default = Section.GENERAL_ADMISSION_STANDING)
-    seat_number = db.Column(db.String(SEAT_MAX), nullable = True)
+    seat_number = db.Column(db.String(4), nullable = True)
     ticket_holder_id = db.Column(db.Integer, db.ForeignKey("ticket_holders.ticket_holder_id", ondelete="RESTRICT"), nullable = False)
     show_id = db.Column(db.Integer, db.ForeignKey("shows.show_id", ondelete="SET NULL"), nullable = True)
 

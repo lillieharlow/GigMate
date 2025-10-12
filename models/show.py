@@ -1,7 +1,6 @@
-from sqlalchemy import CheckConstraint, DateTime
+from sqlalchemy import CheckConstraint
 
 from init import db
-from utils.constraints import DATETIME_DISPLAY_FORMAT
 
 class Show(db.Model):
     __tablename__ = "shows"

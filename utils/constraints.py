@@ -20,14 +20,3 @@ address_validation_error = "Address must follow Google Maps style: 'Number (opti
 # DateTime format constants for consistent display
 DATETIME_DISPLAY_FORMAT = "%d-%m-%Y | %I:%M %p"  # e.g., "15-10-2025 | 08:30 PM"
 DATE_DISPLAY_FORMAT = "%d-%m-%Y"  # e.g., "15-10-2025"
-
-# Common string lengths used across the app
-FIRST_NAME_MAX = 20
-LAST_NAME_MAX = 30
-EMAIL_MAX = 100
-PHONE_MAX = 15
-FULL_NAME_MAX = 50
-VENUE_NAME_MAX = 30
-VENUE_LOCATION_MAX = 100
-SEAT_MAX = 4
-EVENT_TITLE_MAX = 100
