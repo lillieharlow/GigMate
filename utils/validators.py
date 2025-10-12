@@ -7,7 +7,7 @@ from .constraints import (
     email_regex, email_validation_error,
     name_regex, name_validation_error,
     venue_title_regex, venue_title_validation_error,
-    address_regex, address_validation_error
+    venue_location_regex, venue_location_validation_error
 )
 
 # Email validation (length + regex)
@@ -46,5 +46,5 @@ venue_title_validators = [
 
 venue_location_validators = [
     validate.Length(max = 200),
-    validate.Regexp(address_regex, error = address_validation_error)
+    validate.Regexp(venue_location_regex, error = venue_location_validation_error)
 ]

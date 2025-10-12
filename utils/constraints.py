@@ -17,9 +17,9 @@ name_validation_error = "Name only accepts letters, spaces, hyphens, and apostro
 venue_title_regex = r"^[A-Za-z0-9]([A-Za-z0-9\s\-'\.&]*[A-Za-z0-9])?$"
 venue_title_validation_error = "Venue title can only contain letters, numbers, spaces, hyphens, apostrophes, and ampersands."
 
-# Address regex for Google Maps style validation - optional street number, location name, suburb, state, postcode
-address_regex = r"^([0-9]+[A-Za-z]?\s+)?[A-Za-z\s\-'\.]+,\s*[A-Za-z\s\-'\.]+\s+[A-Z]{2,3}\s+[0-9]{4}$"
-address_validation_error = "Address must follow Google Maps style: 'Number (optional) Location Name, Suburb/City STATE POSTCODE'"
+# Venue location regex for Google Maps style validation - optional street number, location name, suburb, state, postcode
+venue_location_regex = r"^([0-9]+[A-Za-z]?\s+)?[A-Za-z\s\-'\.]+,\s*[A-Za-z\s\-'\.]+\s+[A-Z]{2,3}\s+[0-9]{4}$"
+venue_location_validation_error = "Location must follow Google Maps style: 'Number (optional) Location Name, Suburb/City STATE POSTCODE'"
 
 # DateTime format constants for consistent display
 DATETIME_DISPLAY_FORMAT = "%d-%m-%Y | %I:%M %p"  # e.g., "15-10-2025 | 08:30 PM"
