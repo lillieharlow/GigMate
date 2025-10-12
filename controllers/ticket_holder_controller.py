@@ -1,3 +1,14 @@
+"""Controller for TicketHolder-related routes and logic.
+Handles all CRUD operations/logic for ticket holders:
+    - Get all ticket holders
+    - Get one ticket holder by ID
+    - Create a new ticket holder
+    - Update an existing ticket holder
+    - Delete a ticket holder
+
+Note: IntegrityError and ValidationError are handled globally in utils.error_handlers.
+"""
+
 import datetime
 
 from flask import Blueprint, jsonify, request
@@ -9,7 +20,6 @@ from models.ticket_holder import TicketHolder
 from models.booking import BookingStatus
 from schemas.schemas import ticket_holder_schema, ticket_holders_schema
 
-# Note: IntegrityError and ValidationError are handled globally in utils.error_handlers
 ticket_holders_bp = Blueprint("ticket_holders", __name__, url_prefix = "/ticket_holders")
 
 # GET / (get all ticket_holders)
@@ -18,11 +28,8 @@ def get_ticket_holders():
     stmt = db.select(TicketHolder)
     ticket_holders_list = db.session.scalars(stmt)
     data = ticket_holders_schema.dump(ticket_holders_list)
-    # If there are no ticket holders, return a friendly 404 message per API requirement.
     if not data:
         return {"message": "No ticket holders found."}, 404
-
-    # Otherwise return the list
     return jsonify(data), 200
 
 # GET /id (get one ticket holder by id)
