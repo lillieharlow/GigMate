@@ -1,6 +1,7 @@
 from sqlalchemy import CheckConstraint
 
 from init import db
+from utils.constraints import name_regex, address_regex
 
 class Venue(db.Model):
     __tablename__ = "venues"
