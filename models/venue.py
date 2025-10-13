@@ -26,5 +26,5 @@ class Venue(db.Model):
     capacity = db.Column(db.Integer, nullable = False)
 
     """Relationship: one venue can host many shows.
-    Delete behaviour: venues with scheduled shows cannot be deleted (RESTRICT)."""
+    Delete behaviour: venues can be deleted, shows at that venue become TBA (SET NULL)."""
     shows = db.relationship("Show", back_populates = "venue")

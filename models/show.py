@@ -21,15 +21,15 @@ class Show(db.Model):
     show_id = db.Column(db.Integer, primary_key = True)
     date_time = db.Column(db.DateTime, nullable = False)  # Use DATETIME_DISPLAY_FORMAT for serialization
     event_id = db.Column(db.Integer, db.ForeignKey("events.event_id", ondelete = "CASCADE"), nullable = False)
-    venue_id = db.Column(db.Integer, db.ForeignKey("venues.venue_id", ondelete = "RESTRICT"), nullable = False)
+    venue_id = db.Column(db.Integer, db.ForeignKey("venues.venue_id", ondelete = "SET NULL"), nullable = True)
     
     """Relationships:
     - one show is one and only one event.
-    - one show can be held at one and only one venue.
+    - one show can be held at one venue (or venue TBD if nullable).
     - one show can have many bookings.
     Delete behaviour:
     - if an event is deleted, all its shows are also deleted (CASCADE).
-    - if a venue is deleted, shows at that venue cannot be deleted (RESTRICT).
+    - if a venue is deleted, shows at that venue have venue_id set to NULL (SET NULL).
     - if a show is deleted, its bookings remain but show_id is set to NULL."""
     event = db.relationship("Event", back_populates = "shows")
     venue = db.relationship("Venue", back_populates = "shows")

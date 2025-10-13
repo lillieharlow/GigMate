@@ -87,7 +87,7 @@ def delete_a_ticket_holder(ticket_holder_id):
         current_date = datetime.now()
         future_confirmed_bookings = [
             booking for booking in ticket_holder.bookings
-            if booking.booking_status == BookingStatus.CONFIRMED and booking.show.date_time > current_date
+            if booking.booking_status == BookingStatus.CONFIRMED and booking.show and booking.show.date_time > current_date
         ]
         if future_confirmed_bookings:
             return {"message": f"Ticket holder with id {ticket_holder_id} can't be deleted because they have future confirmed bookings."}, 400

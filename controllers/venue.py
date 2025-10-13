@@ -80,10 +80,12 @@ def delete_a_venue(venue_id):
     stmt = db.select(Venue).where(Venue.venue_id == venue_id)
     venue = db.session.scalar(stmt)
     if venue:
-        if venue.shows:
-            return {"message": "Cannot delete venue with scheduled shows"}, 400
+        show_count = len(venue.shows) if venue.shows else 0
         db.session.delete(venue)
         db.session.commit()
-        return {"message": f"Venue with id {venue_id} has been deleted."}, 200
+        if show_count > 0:
+            return {"message": f"Venue with id {venue_id} has been deleted. {show_count} shows now display 'Venue To Be Announced'."}, 200
+        else:
+            return {"message": f"Venue with id {venue_id} has been deleted."}, 200
     else:
         return {"message": f"Venue with id {venue_id} doesn't exist."}, 404
