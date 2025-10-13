@@ -1,0 +1,92 @@
+"""Controller for Show-related routes and logic.
+Handles all CRUD operations/logic for shows:
+    - Get all shows
+    - Get one show by ID
+    - Create a new show
+    - Update an existing show
+    - Delete a show (cancelling all associated bookings)
+
+Note: IntegrityError and ValidationError are handled globally in utils.error_handlers.
+"""
+
+from flask import Blueprint, jsonify, request
+from sqlalchemy.exc import IntegrityError
+from marshmallow import ValidationError
+
+from init import db
+from models.show import Show
+from models.booking import BookingStatus
+from schemas.schemas import show_schema, shows_schema
+
+shows_bp = Blueprint("shows", __name__, url_prefix = "/shows")
+
+# GET / (get all shows)
+@shows_bp.route("/", methods = ["GET"])
+def get_shows():
+    stmt = db.select(Show)
+    shows_list = db.session.scalars(stmt)
+    data = shows_schema.dump(shows_list)
+    if not data:
+        return {"message": "No shows found. Please add a show to get started."}, 404
+    return jsonify(data), 200
+
+# GET /id (get one show by id)
+@shows_bp.route("/<int:show_id>", methods = ["GET"])
+def get_one_show(show_id):
+    stmt = db.select(Show).where(Show.show_id == show_id)
+    show = db.session.scalar(stmt)
+    data = show_schema.dump(show)
+    if data:
+        return jsonify(data), 200
+    else:
+        return {"message": f"Show with id {show_id} doesn't exist."}, 404
+
+# POST / (create a new show)
+@shows_bp.route("/", methods = ["POST"])
+def create_a_show():
+    body_data = request.get_json()
+    new_show = show_schema.load(
+        body_data,
+        session = db.session
+    )
+    db.session.add(new_show)
+    db.session.commit()
+    return show_schema.dump(new_show), 201
+
+# PATCH/PUT /id (update show by id)
+@shows_bp.route("/<int:show_id>", methods = ["PUT", "PATCH"])
+def update_a_show(show_id):
+    stmt = db.select(Show).where(Show.show_id == show_id)
+    show = db.session.scalar(stmt)
+    if not show:
+        return {"message": f"Show with id {show_id} doesn't exist."}, 404
+    else:
+        try:
+            update_show = show_schema.load(
+                request.get_json(),
+                instance = show,
+                session = db.session,
+                partial = True
+            )
+            db.session.commit()
+            return show_schema.dump(update_show), 200
+        except ValidationError as err:
+            return jsonify(err.messages), 400
+        except IntegrityError as err:
+            db.session.rollback()
+            return {"message": str(err.orig) if getattr(err, 'orig', None) else str(err)}, 400
+    
+# DELETE /id (delete show by id)
+@shows_bp.route("/<int:show_id>", methods = ["DELETE"])
+def delete_a_show(show_id):
+    stmt = db.select(Show).where(Show.show_id == show_id)
+    show = db.session.scalar(stmt)
+    if not show:
+        return {"message": f"Show with id {show_id} doesn't exist."}, 404
+
+    for booking in show.bookings: # Cancel bookings for this show
+        booking.booking_status = BookingStatus.CANCELLED
+    
+    db.session.delete(show)
+    db.session.commit()
+    return {"message": f"Show id {show_id} has been deleted; its bookings have been marked as cancelled."}, 200
