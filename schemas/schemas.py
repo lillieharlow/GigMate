@@ -1,7 +1,7 @@
 import re
 
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
-from marshmallow import fields, pre_load, validate
+from marshmallow import fields, pre_load, validate, ValidationError, validates
 
 from models.ticket_holder import TicketHolder
 from models.organiser import Organiser
@@ -98,3 +98,32 @@ class VenueSchema(SQLAlchemyAutoSchema):
 
 venue_schema = VenueSchema()
 venues_schema = VenueSchema(many = True)
+
+# ========== Event Schema ==========
+class EventSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Event
+        load_instance = True
+        include_fk = True
+        include_relationships = True
+        fields = ("event_id", "title", "description", "duration_hours", "shows", "organiser")
+    
+    shows = fields.List(fields.Nested("ShowSchema", only = ("show_id", "date_time", "venue_id")))
+    organiser = fields.Nested("OrganiserSchema", dump_only = True, only = ("organiser_id",))
+    
+    title = auto_field(required = True, validate = [validate.Length(min = 3, max = 100)])
+    description = auto_field()
+    duration_hours = fields.Float(required = True, validate = [
+        validate.Range(min = 0.1, max = 12, error = "Duration must be between 0.1 and 12 hours")
+    ])
+    
+    @pre_load
+    def normalize_event(self, data, **kwargs):
+        if isinstance(data, dict):
+            title = data.get('title')
+            if isinstance(title, str):
+                data['title'] = title.strip()
+        return data
+
+event_schema = EventSchema()
+events_schema = EventSchema(many = True)
