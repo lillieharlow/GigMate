@@ -146,7 +146,7 @@ When BADLANDS was first released on August 28, 2015, it catapulted Halsey into m
         section = Section.SEATING,
         seat_number = "G12",
         ticket_holder_id = ticket_holders[3].ticket_holder_id,
-        show_id = shows[0].show_id
+        show_id = shows[1].show_id
     ), Booking(
         booking_status = BookingStatus.CONFIRMED,
         section = Section.GENERAL_ADMISSION_STANDING,

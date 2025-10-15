@@ -1,3 +1,7 @@
+"""Flask application factory and configuration.
+Sets up the Flask app, database connection, and registers blueprints.
+"""
+
 import os
 
 from flask import Flask

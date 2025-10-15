@@ -9,7 +9,7 @@ Handles all CRUD operations/logic for ticket holders:
 Note: IntegrityError and ValidationError are handled globally in utils.error_handlers.
 """
 
-import datetime
+from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError

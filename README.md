@@ -121,9 +121,7 @@ GigMate runs on macOS, Linux and Windows (WSL). For development, Python 3.8+ is 
 ### Run the API
 Drop, create and seed demo data from `cli_controller`.
 ```bash
-flask db drop
-flask db create
-flask db seed
+flask db drop && flask db create && flask db seed
 ```
 Run the server:
 ```bash
@@ -193,7 +191,7 @@ Base URL: `http://127.0.0.1:5000/`
 | GET    | `/shows/<id>`        | Get one show by ID               |
 | POST   | `/shows/`            | Create a new show                |
 | PATCH/PUT  | `/shows/<id>`        | Update a show by ID    |
-| DELETE | `/shows/<id>`        | Delete (cancel) a show by ID     |
+| DELETE | `/shows/<id>`        | Cancel a show by ID (cancels all bookings, preserves show data) |
 
 ### Events (`/events`)
 | Method | Endpoint              | Description                      |
@@ -202,9 +200,7 @@ Base URL: `http://127.0.0.1:5000/`
 | GET    | `/events/<id>`       | Get one event by ID              |
 | POST   | `/events/`           | Create a new event               |
 | PATCH/PUT  | `/events/<id>`       | Update an event by ID |
-| DELETE | `/events/<id>`       | Delete (cancel) an event by ID   |
-
----
+| DELETE | `/events/<id>`       | Cancel an event by ID (cancels all bookings, preserves event data) |
 
 ### Venues (`/venues`)
 | Method | Endpoint              | Description                      |
@@ -215,8 +211,6 @@ Base URL: `http://127.0.0.1:5000/`
 | PATCH/PUT  | `/venues/<id>`       | Update a venue by ID  |
 | DELETE | `/venues/<id>`       | Delete a venue by ID             |
 
----
-
 ### Organisers (`/organisers`)
 | Method | Endpoint              | Description                      |
 |--------|----------------------|----------------------------------|
@@ -226,8 +220,6 @@ Base URL: `http://127.0.0.1:5000/`
 | PATCH/PUT  | `/organisers/<id>`   | Update an organiser     |
 | DELETE | `/organisers/<id>`   | Delete an organiser by ID        |
 
----
-
 ### Bookings (`/bookings`)
 | Method | Endpoint              | Description                      |
 |--------|----------------------|----------------------------------|
@@ -236,8 +228,6 @@ Base URL: `http://127.0.0.1:5000/`
 | POST   | `/bookings/`         | Create a new booking             |
 | PATCH/PUT  | `/bookings/<id>`     | Update a booking by ID |
 | DELETE | `/bookings/<id>`     | Delete a booking by ID           |
-
----
 
 ### Ticket Holders (`/ticket_holders`)
 | Method | Endpoint                    | Description                          |
