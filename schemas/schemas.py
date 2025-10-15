@@ -10,7 +10,7 @@ from models.event import Event
 from models.show import Show
 from models.booking import Booking
 from utils.validators import email_validators, phone_validators, first_name_validators, last_name_validators, full_name_validators, venue_title_validators, venue_location_validators
-from utils.constraints import DATETIME_DISPLAY_FORMAT, DATE_DISPLAY_FORMAT
+from utils.constraints import DATETIME_DISPLAY_FORMAT, DATE_DISPLAY_FORMAT, DATETIME_VALIDATION_ERROR
 
 # ========== TicketHolder Schema ==========
 class TicketHolderSchema(SQLAlchemyAutoSchema):
@@ -78,12 +78,12 @@ class VenueSchema(SQLAlchemyAutoSchema):
         include_relationships = True
         fields = ("venue_id", "name", "location", "capacity", "shows")
     
-    shows = fields.List(fields.Nested("ShowSchema", only = ("show_id", "date_time")))
+    shows = fields.List(fields.Nested("ShowSchema", only = ("show_id", "date_time", "event")))
 
     name = auto_field(required = True, validate = venue_title_validators)
     location = auto_field(required = True, validate = venue_location_validators)
     capacity = fields.Integer(required = True, validate = [
-        validate.Range(min = 1, max = 200000, error = "Capacity must be between 1 and 200,000")
+        validate.Range(min = 1, max = 200000, error = "Capacity must be a number between 1 and 200,000")
     ])
     
     @pre_load
@@ -109,7 +109,7 @@ class EventSchema(SQLAlchemyAutoSchema):
         include_relationships = True
         fields = ("event_id", "title", "description", "duration_hours", "shows", "organiser")
     
-    shows = fields.List(fields.Nested("ShowSchema", only = ("show_id", "date_time", "venue_id")))
+    shows = fields.List(fields.Nested("ShowSchema", only = ("show_id", "date_time", "venue")))
     organiser = fields.Nested("OrganiserSchema", dump_only = True, only = ("organiser_id",))
     
     organiser_id = fields.Integer(allow_none = True, validate = [
@@ -139,13 +139,14 @@ class ShowSchema(SQLAlchemyAutoSchema):
         load_instance = True
         include_fk = True
         include_relationships = True
-        fields = ("show_id", "date_time", "event_id", "venue_id", "bookings", "event", "venue")
+        fields = ("show_id", "date_time", "show_status", "event", "venue")
     
     event = fields.Nested("EventSchema", dump_only = True, only = ("title",))
     venue = fields.Nested("VenueSchema", dump_only = True, only = ("name", "location"))
-    bookings = fields.List(fields.Nested("BookingSchema", exclude = ("show", "show_id")))
 
-    date_time = fields.DateTime(required = True, format = DATETIME_DISPLAY_FORMAT)
+    date_time = fields.DateTime(required = True, format = DATETIME_DISPLAY_FORMAT, error_messages = {
+        'invalid': DATETIME_VALIDATION_ERROR
+    })
     event_id = fields.Integer(required = True, validate = [
         validate.Range(min = 1, error = "Event ID must be a positive number")
     ])
@@ -153,10 +154,11 @@ class ShowSchema(SQLAlchemyAutoSchema):
         validate.Range(min = 1, error = "Venue ID must be a positive number")
     ])
 
-    @post_dump
+    @post_dump # If a show has no venue, add placeholder.
     def add_venue_placeholder(self, data, **kwargs):
-        """If a show has no venue, inject a placeholder venue for the client."""
-        if not data.get('venue'):
+        # Only add placeholder if venue field is expected but venue_id is actually None in DB
+        # AND no venue data was loaded (not just missing from the nested fields)
+        if 'venue' in data and data.get('venue') is None and data.get('venue_id') is None:
             data['venue'] = {
                 'name': 'Venue To Be Announced',
                 'location': 'TBA'
