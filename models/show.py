@@ -16,7 +16,7 @@ class Show(db.Model):
         venue (Venue): The venue of the show.
         bookings (list): List of bookings associated with the show."""
     __table_args__ = (
-        db.UniqueConstraint('event_id', 'venue_id', 'date_time', name='unique_show_occurrence'), # Prevent duplicate shows
+        db.UniqueConstraint('venue_id', 'date_time', name='unique_show_occurrence'), # Prevent duplicate shows
         CheckConstraint("date_time > CURRENT_TIMESTAMP", name='check_future_show'), # Ensure shows are scheduled in the future
     )
 

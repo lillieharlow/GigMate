@@ -8,6 +8,7 @@ Handles all CRUD operations/logic for shows:
 
 Note: IntegrityError and ValidationError are handled globally in utils.error_handlers.
 """
+from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
@@ -15,7 +16,7 @@ from marshmallow import ValidationError
 
 from init import db
 from models.show import Show, ShowStatus
-from utils.constraints import BookingStatus
+from utils.constraints import BookingStatus, DATETIME_DISPLAY_FORMAT
 from schemas.schemas import show_schema, shows_schema
 
 shows_bp = Blueprint("shows", __name__, url_prefix = "/shows")
@@ -42,9 +43,27 @@ def get_one_show(show_id):
         return {"message": f"Show with id {show_id} doesn't exist."}, 404
 
 # POST / (create a new show)
+"""venue_id is nullable to allow for pop-up events without a fixed venue.
+try/except block added to catch IntegrityError from UniqueConstraint on (event_id, venue_id, date_time)
+otherwise duplicate shows could be created."""
 @shows_bp.route("/", methods = ["POST"])
 def create_a_show():
     body_data = request.get_json()
+    event_id = body_data.get("event_id")
+    date_time = body_data.get("date_time")
+    venue_id = body_data.get("venue_id")
+    try:
+        dt_obj = datetime.strptime(date_time, DATETIME_DISPLAY_FORMAT)
+    except Exception:
+        dt_obj = date_time  # fallback if already datetime
+    # Query for existing show
+    duplicate = db.session.query(Show).filter(
+        Show.event_id == event_id,
+        Show.date_time == dt_obj,
+        Show.venue_id == venue_id
+    ).first()
+    if duplicate:
+        return {"message": "A show for this event, date, and venue already exists"}, 409
     new_show = show_schema.load(
         body_data,
         session = db.session
