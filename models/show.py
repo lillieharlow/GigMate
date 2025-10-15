@@ -1,6 +1,8 @@
 from sqlalchemy import CheckConstraint
+from sqlalchemy.types import Enum
 
 from init import db
+from utils.constraints import ShowStatus
 
 class Show(db.Model):
     __tablename__ = "shows"
@@ -20,6 +22,7 @@ class Show(db.Model):
 
     show_id = db.Column(db.Integer, primary_key = True)
     date_time = db.Column(db.DateTime, nullable = False)  # Use DATETIME_DISPLAY_FORMAT for serialization
+    show_status = db.Column(Enum(ShowStatus), nullable = False, default = ShowStatus.CONFIRMED)
     event_id = db.Column(db.Integer, db.ForeignKey("events.event_id", ondelete = "CASCADE"), nullable = False)
     venue_id = db.Column(db.Integer, db.ForeignKey("venues.venue_id", ondelete = "SET NULL"), nullable = True)
     

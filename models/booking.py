@@ -1,22 +1,8 @@
-import enum
-
 from sqlalchemy import func
 from sqlalchemy.types import Enum
 
 from init import db
-
-# Define set values for booking_status column of booking table.
-class BookingStatus(enum.Enum):
-    CONFIRMED = "Confirmed"
-    CANCELLED = "Cancelled"
-    REFUNDED = "Refunded"
-    
-# Define set values for section column of booking table.
-class Section(enum.Enum):
-    GENERAL_ADMISSION_STANDING = "General Admission/Standing"
-    SEATING = "Seating"
-    VIP = "VIP"
-    ACCESSIBLE = "Accessible"
+from utils.constraints import BookingStatus, Section
 
 class Booking(db.Model):
     __tablename__ = "bookings"
@@ -25,7 +11,7 @@ class Booking(db.Model):
         booking_id (int): Primary key.
         booking_date (date): Date of the booking.
         booking_status (BookingStatus): Status of the booking (Confirmed, Cancelled, Refunded).
-        section (Section): Section of the venue (General Admission/Standing, Seating, VIP, Accessible).
+        section (Section): Section of the venue (General Admission Standing, Seating).
         seat_number (str): Seat number if applicable (nullable for General Admission).
         ticket_holder_id (int): Foreign key to the ticket holder.
         show_id (int): Foreign key to the show.
@@ -42,7 +28,7 @@ class Booking(db.Model):
     section = db.Column(Enum(Section), nullable = False, default = Section.GENERAL_ADMISSION_STANDING)
     seat_number = db.Column(db.String(4), nullable = True)
     ticket_holder_id = db.Column(db.Integer, db.ForeignKey("ticket_holders.ticket_holder_id", ondelete="RESTRICT"), nullable = False)
-    show_id = db.Column(db.Integer, db.ForeignKey("shows.show_id", ondelete="SET NULL"), nullable = True)
+    show_id = db.Column(db.Integer, db.ForeignKey("shows.show_id", ondelete="RESTRICT"), nullable = False)
 
     """Relationships:
     - one booking has one and only one ticket_holder.
