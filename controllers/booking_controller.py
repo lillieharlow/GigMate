@@ -20,14 +20,21 @@ from schemas.schemas import booking_schema, bookings_schema
 bookings_bp = Blueprint("bookings", __name__, url_prefix = "/bookings")
 
 # GET / (get all bookings)
-@bookings_bp.route("/", methods = ["GET"])
+@bookings_bp.route("/", methods=["GET"])
 def get_bookings():
-    stmt = db.select(Booking)
-    bookings_list = db.session.scalars(stmt)
-    data = bookings_schema.dump(bookings_list)
+    page = int(request.args.get("page", 1))
+    per_page = int(request.args.get("per_page", 10))
+    bookings_list = Booking.query.paginate(page=page, per_page=per_page, error_out=False)
+    data = bookings_schema.dump(bookings_list.items)
     if not data:
         return {"message": "No bookings found. Please add a booking to get started."}, 404
-    return jsonify(data), 200
+    return {
+        "bookings": data,
+        "page": page,
+        "per_page": per_page,
+        "total": bookings_list.total,
+        "pages": bookings_list.pages
+    }, 200
 
 # GET /id (get one booking by id)
 @bookings_bp.route("/<int:booking_id>", methods = ["GET"])
