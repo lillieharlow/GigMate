@@ -1,7 +1,7 @@
 import re
 
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
-from marshmallow import fields, pre_load, post_dump, validate, ValidationError, validates_schema
+from marshmallow import fields, pre_load, post_dump, validate, ValidationError, validates
 
 from models.ticket_holder import TicketHolder
 from models.organiser import Organiser
@@ -10,7 +10,7 @@ from models.event import Event
 from models.show import Show
 from models.booking import Booking
 from utils.validators import email_validators, phone_validators, first_name_validators, last_name_validators, full_name_validators, venue_title_validators, venue_location_validators
-from utils.constraints import DATETIME_DISPLAY_FORMAT, DATE_DISPLAY_FORMAT, DATETIME_VALIDATION_ERROR
+from utils.constraints import DATE_DISPLAY_FORMAT, DATETIME_DISPLAY_FORMAT, DATETIME_VALIDATION_ERROR, BookingStatus, Section, ShowStatus
 
 # ========== TicketHolder Schema ==========
 class TicketHolderSchema(SQLAlchemyAutoSchema):
@@ -139,10 +139,24 @@ class ShowSchema(SQLAlchemyAutoSchema):
         load_instance = True
         include_fk = True
         include_relationships = True
-        fields = ("show_id", "date_time", "show_status", "event", "venue")
+        fields = ("show_id", "date_time", "show_status", "event_id", "event", "venue_id", "venue")
     
     event = fields.Nested("EventSchema", dump_only = True, only = ("title",))
     venue = fields.Nested("VenueSchema", dump_only = True, only = ("name", "location"))
+
+    # Simple string field with enum validation - no hassle!
+    show_status = fields.Str(validate=validate.OneOf(['CONFIRMED', 'CANCELLED', 'POSTPONED', 'RESCHEDULED']))
+
+    @post_dump
+    def convert_enum_to_value(self, data, **kwargs):
+        """Convert enum objects to their string values"""
+        if 'show_status' in data:
+            if hasattr(data['show_status'], 'value'):
+                data['show_status'] = data['show_status'].value
+            elif isinstance(data['show_status'], str) and 'ShowStatus.' in data['show_status']:
+                # Handle case where enum is converted to string representation
+                data['show_status'] = data['show_status'].split('.')[-1]
+        return data
 
     date_time = fields.DateTime(required = True, format = DATETIME_DISPLAY_FORMAT, error_messages = {
         'invalid': DATETIME_VALIDATION_ERROR
@@ -174,54 +188,48 @@ class BookingSchema(SQLAlchemyAutoSchema):
         model = Booking
         load_instance = True
         include_fk = True
-        include_relationships = True
         fields = ("booking_id", "booking_date", "booking_status", "section", "seat_number", "ticket_holder_id", "show_id", "ticket_holder", "show")
     
-    ticket_holder = fields.Nested("TicketHolderSchema", dump_only = True, only = ("first_name", "last_name"))
-    show = fields.Nested("ShowSchema", dump_only = True, only = ("date_time", "event", "venue"))
+    # Simple nested fields for display
+    ticket_holder = fields.Nested("TicketHolderSchema", dump_only=True, only=("first_name", "last_name"))
+    show = fields.Nested("ShowSchema", dump_only=True, only=("date_time", "event"))
 
-    booking_date = fields.Date(format = DATE_DISPLAY_FORMAT, dump_only = True)
-    ticket_holder_id = fields.Integer(required = True, validate = [
-        validate.Range(min = 1, error = "Ticket Holder ID must be a positive number")
-    ])
-    show_id = fields.Integer(allow_none = True, validate = [
-        validate.Range(min = 1, error = "Show ID must be a positive number")
-    ])
-    seat_number = fields.Str(allow_none = True, validate = [
-        validate.Length(min = 1, max = 4, error = "Seat number must be 1-4 characters")
-    ])
+    # Simple string fields with enum validation - no hassle!
+    booking_status = fields.Str(validate=validate.OneOf(['CONFIRMED', 'CANCELLED', 'REFUNDED']))
+    section = fields.Str(validate=validate.OneOf(['GENERAL_ADMISSION_STANDING', 'SEATING']))
 
-    @pre_load
-    def normalize_booking(self, data, **kwargs):
-        if isinstance(data, dict):  # Normalise incoming booking data
-            seat = data.get('seat_number')
-            if seat == "":
-                data['seat_number'] = None
-            elif isinstance(seat, str):
-                data['seat_number'] = seat.strip()
-
-            section = data.get('section') # Normalise section str to uppercase
-            if section is None:
-                data['section'] = 'GENERAL_ADMISSION_STANDING' # default set to GA
-            elif isinstance(section, str):
-                data['section'] = section.strip().upper()
+    @post_dump
+    def convert_enum_to_value(self, data, **kwargs):
+        """Convert enum objects to their string values"""
+        if 'booking_status' in data:
+            if hasattr(data['booking_status'], 'value'):
+                data['booking_status'] = data['booking_status'].value
+            elif isinstance(data['booking_status'], str) and 'BookingStatus.' in data['booking_status']:
+                data['booking_status'] = data['booking_status'].split('.')[-1]
+        if 'section' in data:
+            if hasattr(data['section'], 'value'):
+                data['section'] = data['section'].value
+            elif isinstance(data['section'], str) and 'Section.' in data['section']:
+                data['section'] = data['section'].split('.')[-1]
         return data
 
-    @validates_schema
-    def check_seat_for_section(self, data, **kwargs): # if seating section is selected then there must be a seat number
+    # Field validations using marshmallow validators
+    booking_date = fields.Date(format=DATE_DISPLAY_FORMAT, dump_only=True)
+    ticket_holder_id = fields.Integer(required=True, validate=[validate.Range(min=1)])
+    show_id = fields.Integer(required=True, validate=[validate.Range(min=1)])
+    seat_number = fields.Str(allow_none=True, validate=[validate.Length(min=1, max=4)])
+
+    @pre_load
+    def validate_seating_requirements(self, data, **kwargs):
+        """Simple seating validation"""
         section = data.get('section')
         seat = data.get('seat_number')
         
-        section_name = None
-        if section is None:
-            section_name = None
-        elif hasattr(section, 'name'):
-            section_name = section.name
-        elif isinstance(section, str):
-            section_name = section.upper()
-
-        if section_name == 'SEATING' and not seat:
-            raise ValidationError({'seat_number': ['seat_number is required when section is SEATING']})
+        # Require seat_number when section is SEATING
+        if section == 'SEATING' and not seat:
+            raise ValidationError({'seat_number': ['Required when section is SEATING']})
+        
+        return data
 
 booking_schema = BookingSchema()
 bookings_schema = BookingSchema(many = True)
