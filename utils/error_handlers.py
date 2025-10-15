@@ -19,6 +19,11 @@ def error_handlers(app):
             
             if err.orig.pgcode == errorcodes.FOREIGN_KEY_VIOLATION:
                 return {"message": err.orig.diag.message_detail}, 409
+            
+            if err.orig.pgcode == errorcodes.CHECK_VIOLATION:
+                if 'check_future_show' in str(err.orig):
+                    return {"message": "Shows can only be scheduled for future dates and times."}, 400
+                return {"message": err.orig.diag.message_detail}, 409
             else:
                 return {"message": "Unknown integrity error occured."}, 409
         else:
