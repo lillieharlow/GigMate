@@ -1,4 +1,4 @@
-from sqlalchemy import CheckConstraint
+from sqlalchemy import CheckConstraint, UniqueConstraint
 
 from init import db
 
@@ -16,6 +16,7 @@ class Event(db.Model):
     __table_args__ = (
         CheckConstraint("duration_hours > 0", name='check_duration_positive'), # Duration must be a positive digit
         CheckConstraint("duration_hours <= 12", name='check_duration_max'),  # Max 12 hours per event
+        UniqueConstraint('title', 'description', name='unique_event_content'), # Prevent duplicate events with same title and description
     )
 
     event_id = db.Column(db.Integer, primary_key = True)

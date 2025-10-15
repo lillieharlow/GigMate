@@ -16,9 +16,8 @@ email_validators = [
     validate.Regexp(email_regex, error = email_validation_error)
 ]
 
-# Phone validation (length + regex)
+# Phone validation (regex only - handles both format and length)
 phone_validators = [
-    validate.Length(min = 10, max = 15, error = "Phone number must be 10-15 characters"), 
     validate.Regexp(phone_regex, error = phone_validation_error)
 ]
 
