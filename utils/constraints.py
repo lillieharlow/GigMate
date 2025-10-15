@@ -17,7 +17,6 @@ class ShowStatus(enum.Enum):
 
 class Section(enum.Enum):
     GENERAL_ADMISSION_STANDING = "General Admission Standing"
-    GENERAL_ADMISSION_SEATING = "General Admission Seating"
     SEATING = "Seating"
 
 # Phone regex for phone number validation
