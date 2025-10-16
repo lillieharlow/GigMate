@@ -144,7 +144,7 @@ class ShowSchema(SQLAlchemyAutoSchema):
     event = fields.Nested("EventSchema", dump_only = True, only = ("title",))
     venue = fields.Nested("VenueSchema", dump_only = True, only = ("name", "location"))
 
-    # Simple string field with enum validation - no hassle!
+    # String field with enum validation
     show_status = fields.Str(validate=validate.OneOf(['CONFIRMED', 'CANCELLED', 'POSTPONED', 'RESCHEDULED']))
 
     @post_dump
@@ -195,12 +195,17 @@ class BookingSchema(SQLAlchemyAutoSchema):
     show = fields.Nested("ShowSchema", dump_only=True, only=("date_time", "event"))
 
     # Simple string fields with enum validation - no hassle!
+    # booking_status and section are validated against allowed values using marshmallow's OneOf validator.
     booking_status = fields.Str(validate=validate.OneOf(['CONFIRMED', 'CANCELLED', 'REFUNDED']))
     section = fields.Str(validate=validate.OneOf(['GENERAL_ADMISSION_STANDING', 'SEATING']))
 
     @post_dump
     def convert_enum_to_value(self, data, **kwargs):
-        """Convert enum objects to their string values"""
+        """
+        Ensure enum fields (booking_status, section) are serialized as plain strings.
+        Handle enum objects and string representations to avoid this: 'BookingStatus.CONFIRMED'.
+        """
+        # Marshmallow doesn’t automatically serialize Python Enums, so convert to string manually.
         if 'booking_status' in data:
             if hasattr(data['booking_status'], 'value'):
                 data['booking_status'] = data['booking_status'].value
@@ -221,15 +226,16 @@ class BookingSchema(SQLAlchemyAutoSchema):
 
     @pre_load
     def validate_seating_requirements(self, data, **kwargs):
-        """Simple seating validation"""
+        """
+        Check if seat_number is provided when section is SEATING.
+        Prevent bookings for seated sections without a seat_number.
+        """
         section = data.get('section')
         seat = data.get('seat_number')
-        
         # Require seat_number when section is SEATING
         if section == 'SEATING' and not seat:
             raise ValidationError({'seat_number': ['Required when section is SEATING']})
-        
         return data
-
+    
 booking_schema = BookingSchema()
 bookings_schema = BookingSchema(many = True)
