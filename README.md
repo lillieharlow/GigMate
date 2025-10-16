@@ -90,6 +90,7 @@ GigMate runs on macOS, Linux and Windows (WSL). For development, Python 3.8+ is 
    source .venv/bin/activate
    pip install -r requirements.txt
    ```
+   
 ### **Set Up PostgreSQL**
    Open PostgreSQL shell
    macOS:
