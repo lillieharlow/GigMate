@@ -1,5 +1,9 @@
-"""Utility module for common constraints and validation patterns to be used across models and schemas.
-Maintains consistency, reusability, maintainability and scalability."""
+"""
+Utility module for common constraints and validation patterns used across models and schemas.
+
+Centralizes enums, regex patterns, and date/time formats to maintain consistency,
+reusability, maintainability, and scalability in data validation across the API.
+"""
 
 import enum
 
@@ -18,6 +22,12 @@ class ShowStatus(enum.Enum):
 class Section(enum.Enum):
     GENERAL_ADMISSION_STANDING = "General Admission Standing"
     SEATING = "Seating"
+    
+
+# DateTime format constants for consistent display
+DATETIME_DISPLAY_FORMAT = "%d-%m-%Y | %I:%M %p"  # e.g., "15-10-2025 | 08:30 PM"
+DATE_DISPLAY_FORMAT = "%d-%m-%Y"  # e.g., "15-10-2025"
+DATETIME_VALIDATION_ERROR = 'Please format Date and time: DD-MM-YYYY | HH:MM AM/PM (e.g., "15-10-2025 | 08:30 PM")'
 
 # Phone regex for phone number validation
 phone_regex = r'^\+?[0-9]{10,15}$'
@@ -39,7 +49,6 @@ venue_title_validation_error = "Venue title can only contain letters, numbers, s
 venue_location_regex = r"^([0-9]+[A-Za-z]?\s+)?[A-Za-z\s\-''\.]+,\s*[A-Za-z\s\-''\.]+\s+[A-Z]{2,3}\s+[0-9]{4}$"
 venue_location_validation_error = "Location must follow Google Maps style exactly: 'Number (optional) Location Name, Suburb/City STATE POSTCODE'"
 
-# DateTime format constants for consistent display
-DATETIME_DISPLAY_FORMAT = "%d-%m-%Y | %I:%M %p"  # e.g., "15-10-2025 | 08:30 PM"
-DATE_DISPLAY_FORMAT = "%d-%m-%Y"  # e.g., "15-10-2025"
-DATETIME_VALIDATION_ERROR = 'Please format Date and time: DD-MM-YYYY | HH:MM AM/PM (e.g., "15-10-2025 | 08:30 PM")'
+# Seat number regex: e.g., A1, B12, AA10 (1-2 letters, 1-2 digits)
+seat_number_regex = r'^[A-Z]{1,2}[0-9]{1,2}$'
+seat_number_validation_error = "Seat number must be 1-2 uppercase letters followed by 1-2 digits (e.g., 'A1', 'B12', 'AA10')."
