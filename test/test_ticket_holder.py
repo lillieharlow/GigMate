@@ -1,20 +1,28 @@
+"""
+Unit tests for the Ticket Holder API endpoints in GigMate.
+
+Tests basic CRUD operations on the /ticket_holders endpoint using the Flask test client.
+Ensures correct HTTP status codes, JSON responses, and database updates.
+"""
+
 from init import db
 from models.ticket_holder import TicketHolder
 
-# TDD for API endpoints on ticket_holder.py:
-
-# GET /ticket_holders
-# Expected response: 404 with message "No ticket holders found."
 def test_get_ticket_holders(client):
+    """GET /ticket_holders
+    Test retrieving all ticket holders when the database is empty.
+    Return: 404 with a friendly message.
+    """
     response = client.get('/ticket_holders/')
-    # When there are no ticket holders, API should return 404 with a friendly message
     assert response.status_code == 404
     data = response.get_json()
     assert data.get('message') == 'No ticket holders found.'
 
-# POST /ticket_holders
-# Expected response: 201 OK, JSON response
 def test_create_ticket_holder_success(client):
+    """POST /ticket_holders
+    Test creating a new ticket holder with valid data.
+    Return: 201 with the created ticket holder's data.
+    """
     new_ticket_holder = {
         "first_name": "John",
         "last_name": "Smith",
@@ -27,9 +35,11 @@ def test_create_ticket_holder_success(client):
     assert 'ticket_holder_id' in ticket_holder
     assert ticket_holder['email'] == 'john@email.com'
 
-# PATCH/PUT /ticket_holders/<ticket_holder_id>
-# Expected response: 200 OK, JSON response
 def test_update_ticket_holder_success(client):
+    """PATCH/PUT /ticket_holders/<ticket_holder_id>
+    Test updating an existing ticket holder's first name.
+    Return: 200 with the updated ticket holder's data.
+    """
     ticket_holder = TicketHolder(
         first_name = "Test",
         last_name = "TicketHolder",

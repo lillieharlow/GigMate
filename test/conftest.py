@@ -1,3 +1,8 @@
+"""
+Pytest fixtures for creating a Flask test client with an in-memory SQLite database.
+Ensures each test runs with a fresh database and proper teardown after completion.
+"""
+
 import pytest
 
 from main import create_app
