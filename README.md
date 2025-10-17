@@ -1,7 +1,10 @@
 # GigMate
+
+**Tech Stack:** Python · Flask · PostgreSQL · SQLAlchemy · Marshmallow
+
 Rock Your Music Events with Ease. GigMate is your backstage pass to managing music tours, venues, organisers, and ticket bookings - all through a powerful RESTful API.
 
-From underground gigs to sold-out stadiums, GigMate keeps your tour in tune, your shows scheduled, and your fans hyped.
+From underground gigs to sold-out stadiums - GigMate keeps your tour in tune, your shows scheduled, and your fans hyped.
 
 Plan. Book. Sell out. Repeat.
 
@@ -21,8 +24,9 @@ Who’s GigMate For?
 <hr>
 
 ## Table of Contents
-* [API Features](api-features)
-* [Setup & Installation](setup--installation)
+* [API Features](#api-features)
+* [Setup & Installation](#setup--installation)
+   * [Quick Start](#quick-start)
    * [System Requirements](#system-requirements)
    * [Clone Repository](#clone-repository)
    * [Install Dependencies](#install-dependencies)
@@ -36,7 +40,7 @@ Who’s GigMate For?
    * [Legal & Ethical Impacts](#legal--ethical-impacts)
    * [Security Impact](#security-impact)
    * [Conflicts](#conflicts)
-* [API Endpoints](api-endpoints)
+* [API Endpoints](#api-endpoints)
    * [Shows](#shows-shows)
    * [Events](#events-events)
    * [Venues](#venues-venues)
@@ -65,12 +69,22 @@ Who’s GigMate For?
 
 GigMate runs on macOS, Linux and Windows (WSL). For development, Python 3.8+ is recommended.
 
+### **Quick Start**
+   ```bash
+   git clone https://github.com/lillieharlow/GigMate.git
+   cd GigMate
+   python3 -m venv .venv && source .venv/bin/activate
+   pip install -r requirements.txt
+   flask run
+   ```
+
 ### **System Requirements**
    - **Python:** 3.8 or newer
    - **pip:** Python package manager
    - **PostgreSQL:** Installed locally or accessible remotely
    - **VSCode or preferred IDE**
    Tip: Verify Python and pip:
+
    ```bash
    python3 --version
    pip3 --version
@@ -83,33 +97,45 @@ GigMate runs on macOS, Linux and Windows (WSL). For development, Python 3.8+ is 
    ```
 
 ### **Install Dependencies**
-   Create .venv and activate.
-   Install pinned dependencies from `requirements.txt`:
+   Create a virtual environment and activate it:
    ```bash
    python3 -m venv .venv
+   # macOS/Linux:
    source .venv/bin/activate
+   # Windows CMD:
+   .venv\Scripts\activate
+   # Windows PowerShell:
+   .venv\Scripts\Activate.ps1
+   ```
+   Then install dependencies:
+   ```bash
    pip install -r requirements.txt
    ```
-   
+
 ### **Set Up PostgreSQL**
-   Open PostgreSQL shell
-   macOS:
-   ```bash
-   psql
-   ```
-   Linux/WSL:
-   ```bash
-   sudo -u postgres psql
-   ```
-   Create database (if needed)
-   ```sql
-   CREATE DATABASE database_name;
-   \c database_name;
-   ```
+    Open PostgreSQL shell:
+    - macOS:
+       ```bash
+       psql
+       ```
+    - Linux/WSL:
+       ```bash
+       sudo -u postgres psql
+       ```
+    - Windows:
+       - Use pgAdmin (GUI) or open the PostgreSQL shell from the Start Menu, or:
+       ```bash
+       psql -U postgres
+       ```
+    Create database (if needed):
+    ```sql
+    CREATE DATABASE database_name;
+    \c database_name;
+    ```
 
 ### Create User & Grant Permissions
    ```sql
-   CREATE USER user-name WITH PASSWORD 'password';
+   CREATE USER user_name WITH PASSWORD 'password';
    GRANT ALL PRIVILEGES ON DATABASE database_name TO user_name;
    GRANT ALL ON SCHEMA public TO user_name;
    \q
@@ -117,12 +143,19 @@ GigMate runs on macOS, Linux and Windows (WSL). For development, Python 3.8+ is 
 
 ### Create `.env` file
    Create your own `.env` file and define your DATABASE_URI.
-   See `.env.example` DATABASE_URI example
+   See `.env.example` DATABASE_URI example:
+   ```
+   DATABASE_URI=database+driver://username:password@server:port/databasename
+   ```
 
 ### Run the API
-Drop, create and seed demo data from `cli_controller`.
+Drop, create, and seed demo data from `controllers/cli_controller.py` with custom CLI commands:
 ```bash
 flask db drop && flask db create && flask db seed
+```
+Or, if using Flask-Migrate, run:
+```bash
+flask db upgrade
 ```
 Run the server:
 ```bash
@@ -143,17 +176,18 @@ The full list is in `requirements.txt`. Key packages include:
 
 | Library | Purpose |
 |---|---|
-| Flask | Web framework and CLI |
-| Flask-SQLAlchemy | DB integration for Flask |
-| SQLAlchemy | ORM layer used by models |
-| marshmallow | Serialization & validation |
-| marshmallow-sqlalchemy | Schema generation for models |
-| python-dotenv | Load `.env` files for local dev |
-| psycopg2-binary | Postgres driver (install on your server only) |
+| `Flask` | Web framework and CLI |
+| `Flask-SQLAlchemy` | DB integration for Flask |
+| `SQLAlchemy` | ORM layer used by models |
+| `marshmallow` | Serialization & validation |
+| `marshmallow-sqlalchemy` | Schema generation for models |
+| `python-dotenv` | Load `.env` files for local dev |
+| `psycopg2-binary` | Postgres driver (install on your server only) |
+| `gunicorn` | Production-grade WSGI server for deploying Flask apps |
 
 Notes:
 - `requirements.txt` in this repo was trimmed to top-level packages; transitive dependencies will be installed automatically by pip.
-- If you are running tests, you will need to install `pytest` seperately (this is not listed on `requirements.txt`).
+- If you are running tests, you will need to install `pytest` separately (this is not listed on `requirements.txt`).
 
 ### Purpose of Key Dependencies
 - App wiring: Flask & Flask-SQLAlchemy
@@ -167,7 +201,7 @@ Notes:
 ### Legal & Ethical Impacts
 - All libraries are open-source with permissive licenses.
 - No external analytics, or tracking code is included.
-- Developers should review licenses if integrating into proprietary software.
+- Developers should verify licenses for commercial use.
 
 ### Security Impact
 - Environment variables must be used for secrets (DB credentials, API keys).
@@ -182,7 +216,7 @@ Notes:
 
 ## API Endpoints
 All endpoints return JSON.
-Full CRUD flexibility, if you don't require all end points, remove them.  
+Full CRUD flexibility, if you don't require all endpoints, remove them.  
 Base URL: `http://127.0.0.1:5000/`
 
 ### Shows (`/shows`)
@@ -192,7 +226,7 @@ Base URL: `http://127.0.0.1:5000/`
 | GET    | `/shows/<id>`        | Get one show by ID               |
 | POST   | `/shows/`            | Create a new show                |
 | PATCH/PUT  | `/shows/<id>`        | Update a show by ID    |
-| DELETE | `/shows/<id>`        | Cancel a show by ID (cancels all bookings, preserves show data) |
+| DELETE | `/shows/<id>`        | Cancel a show by ID (cancels all bookings but retains historical show data.) |
 
 ### Events (`/events`)
 | Method | Endpoint              | Description                      |
@@ -200,8 +234,8 @@ Base URL: `http://127.0.0.1:5000/`
 | GET    | `/events/`           | Get all events                   |
 | GET    | `/events/<id>`       | Get one event by ID              |
 | POST   | `/events/`           | Create a new event               |
-| PATCH/PUT  | `/events/<id>`       | Update an event by ID |
-| DELETE | `/events/<id>`       | Cancel an event by ID (cancels all bookings, preserves event data) |
+| PATCH/PUT  | `/events/<id>`       | Update an event by ID (partial or full update) |
+| DELETE | `/events/<id>`       | Cancel an event by ID (cancels all bookings but retains historical show data.) |
 
 ### Venues (`/venues`)
 | Method | Endpoint              | Description                      |
@@ -209,7 +243,7 @@ Base URL: `http://127.0.0.1:5000/`
 | GET    | `/venues/`           | Get all venues                   |
 | GET    | `/venues/<id>`       | Get one venue by ID              |
 | POST   | `/venues/`           | Create a new venue               |
-| PATCH/PUT  | `/venues/<id>`       | Update a venue by ID  |
+| PATCH/PUT  | `/venues/<id>`       | Update a venue by ID (partial or full update)  |
 | DELETE | `/venues/<id>`       | Delete a venue by ID             |
 
 ### Organisers (`/organisers`)
@@ -218,17 +252,30 @@ Base URL: `http://127.0.0.1:5000/`
 | GET    | `/organisers/`       | Get all organisers               |
 | GET    | `/organisers/<id>`   | Get one organiser by ID          |
 | POST   | `/organisers/`       | Create a new organiser           |
-| PATCH/PUT  | `/organisers/<id>`   | Update an organiser     |
+| PATCH/PUT  | `/organisers/<id>`   | Update an organiser by ID (partial or full update)     |
 | DELETE | `/organisers/<id>`   | Delete an organiser by ID        |
 
 ### Bookings (`/bookings`)
 | Method | Endpoint              | Description                      |
 |--------|----------------------|----------------------------------|
-| GET    | `/bookings/`         | Get all bookings                 |
+| GET    | `/bookings/`         | Get all bookings (supports pagination)                  |
 | GET    | `/bookings/<id>`     | Get one booking by ID            |
 | POST   | `/bookings/`         | Create a new booking             |
-| PATCH/PUT  | `/bookings/<id>`     | Update a booking by ID |
+| PATCH/PUT  | `/bookings/<id>`     | Update a booking by ID (partial or full update) |
 | DELETE | `/bookings/<id>`     | Delete a booking by ID           |
+
+#### Pagination Parameters
+`GET /bookings/` supports pagination using query parameters:
+
+| Parameter | Type | Default | Description |
+|------------|------|----------|-------------|
+| `page`     | int  | 1        | Page number to retrieve |
+| `per_page` | int  | 10       | Number of records per page |
+
+**Example:**
+```bash
+GET /bookings?page=2
+```
 
 ### Ticket Holders (`/ticket_holders`)
 | Method | Endpoint                    | Description                          |
@@ -236,7 +283,7 @@ Base URL: `http://127.0.0.1:5000/`
 | GET    | `/ticket_holders/`          | Get all ticket holders               |
 | GET    | `/ticket_holders/<id>`      | Get one ticket holder by ID          |
 | POST   | `/ticket_holders/`          | Create a new ticket holder           |
-| PATCH/PUT  | `/ticket_holders/<id>`      | Update a ticket holder     |
+| PATCH/PUT  | `/ticket_holders/<id>`      | Update a ticket holder by ID (partial or full update)     |
 | DELETE | `/ticket_holders/<id>`      | Delete a ticket holder by ID         |
 
 #### Common Response Codes
@@ -270,7 +317,7 @@ Guest Manager. (n.d.) *Build your own ticketing platform*, https://www.guestmana
 
 Leapcell. (2025) *Mastering RESTful API Design: A Practical Guide*, https://leapcell.substack.com/p/mastering-restful-api-design-a-practical?utm_campaign=post&utm_medium=web, accessed: on 1 October 2025.
 
-Marshmallow. (n.d.) *Matshmallow*, https://marshmallow.readthedocs.io/en/stable/index.html, accessed: 9 October 2025.
+Marshmallow. (n.d.) *Marshmallow*, https://marshmallow.readthedocs.io/en/stable/index.html, accessed: 9 October 2025.
 
 Paudel, A. (2025) *2025-JUN-flask-lms*, https://github.com/APaud3l/2025-JUN-flask-lms, accessed: 12 October 2025.
 
