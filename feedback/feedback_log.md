@@ -87,8 +87,22 @@ Actions taken:
 
 3. Implemented pagination for the booking model to improve scalability and performance. This ensures that if a user searches through large volumes of bookings or events (for example, venues hosting hundreds of gigs), the API remains fast and responsive without overloading the system.
 
-4. Testing: `test_seat_uniqueness_per_show`, `test_get_ticket_holders`, `test_create_ticket_holder_success`, `test_update_ticket_holder_success`, 
+4. Testing tested and passed: `test_seat_uniqueness_per_show`, `test_get_ticket_holders`, `test_create_ticket_holder_success`, `test_update_ticket_holder_success`.
 
 ## FEEDBACK LOG 4
 
-Date:
+Date: 16th October 2025
+
+Checked by: Joshua Duong
+
+Document checked: ```Relational ERD``` & GigMate Repo - https://github.com/lillieharlow/GigMate
+
+Feedback:
+
+"That's a lot to unpack and well done on the assignment!! It looks very good so I have very little in terms of feedback to give.
+
+One little bit I'd add is to include Windows/Ubuntu installation/setup instructions where your MAC stuff is."
+
+Actions taken:
+
+1. Add windows/Ubuntu installation and set up instructions to `README.md`.
