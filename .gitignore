@@ -10,3 +10,7 @@ __pycache__/
 
 # Pytest
 .pytest_cache/
+
+# Assignment Documents for feedback log & database choice
+.feedback/
+
