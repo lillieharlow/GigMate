@@ -6,7 +6,8 @@ Handles all CRUD operations/logic for organisers:
     - Update an existing organiser
     - Delete an organiser
 
-Note: IntegrityError and ValidationError are handled globally in utils.error_handlers.
+Note:
+    - IntegrityError and ValidationError are handled globally in utils.error_handlers.
 """
 
 from flask import Blueprint, jsonify, request
@@ -19,19 +20,21 @@ from schemas.schemas import organiser_schema, organisers_schema
 
 organisers_bp = Blueprint("organisers", __name__, url_prefix = "/organisers")
 
-# GET / (get all organisers)
+# ========= GET ALL ORGANISERS =========
 @organisers_bp.route("/", methods = ["GET"])
 def get_organisers():
+    """Retrieve all organisers."""
     stmt = db.select(Organiser)
     organisers_list = db.session.scalars(stmt)
     data = organisers_schema.dump(organisers_list)
     if not data:
         return {"message": "No organisers found."}, 200
     return jsonify(data), 200
-     
-# GET /id (get one organiser by id)
+
+# ========= GET ONE ORGANISER =========
 @organisers_bp.route("/<int:organiser_id>", methods = ["GET"])
 def get_one_organiser(organiser_id):
+    """Retrieve one organiser by ID."""
     stmt = db.select(Organiser).where(Organiser.organiser_id == organiser_id)
     organiser = db.session.scalar(stmt)
     data = organiser_schema.dump(organiser)
@@ -39,10 +42,11 @@ def get_one_organiser(organiser_id):
         return jsonify(data), 200
     else:
         return {"message": f"Organiser with id {organiser_id} doesn't exist."}, 404
-    
-# POST / (create a new organiser)
+
+# ========= CREATE NEW ORGANISER =========
 @organisers_bp.route("/", methods = ["POST"])
 def create_organiser():
+    """Create a new organiser."""
     body_data = request.get_json()
     new_organiser = organiser_schema.load(
         body_data,
@@ -52,9 +56,10 @@ def create_organiser():
     db.session.commit()
     return organiser_schema.dump(new_organiser), 201
 
-# PATCH/PUT /id (update organiser by id)
+# ========= UPDATE ORGANISER =========
 @organisers_bp.route("/<int:organiser_id>", methods = ["PUT", "PATCH"])
 def update_organiser(organiser_id):
+    """Update an existing organiser by ID."""
     stmt = db.select(Organiser).where(Organiser.organiser_id == organiser_id)
     organiser = db.session.scalar(stmt)
     if not organiser:
@@ -75,9 +80,10 @@ def update_organiser(organiser_id):
             db.session.rollback()
             return {"message": str(err.orig) if getattr(err, 'orig', None) else str(err)}, 400
 
-# DELETE /id (delete organiser by id)
+# ========= DELETE ORGANISER =========
 @organisers_bp.route("/<int:organiser_id>", methods = ["DELETE"])
 def delete_organiser(organiser_id):
+    """Delete organiser by ID."""
     stmt = db.select(Organiser).where(Organiser.organiser_id == organiser_id)
     organiser = db.session.scalar(stmt)
     if organiser:

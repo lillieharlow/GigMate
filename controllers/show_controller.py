@@ -2,11 +2,13 @@
 Handles all CRUD operations/logic for shows:
     - Get all shows
     - Get one show by ID
-    - Create a new show
-    - Update an existing show
-    - Cancel a show (cancelling all associated bookings)
+    - Create new show
+    - Update existing show
+    - Cancel show (cancelling all associated bookings)
 
-Note: IntegrityError and ValidationError are handled globally in utils.error_handlers.
+Note:
+    - IntegrityError and ValidationError are handled globally in utils.error_handlers.
+    - Shows are never deleted from the database for audit/history purposes.
 """
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
@@ -19,9 +21,10 @@ from schemas.schemas import show_schema, shows_schema
 
 shows_bp = Blueprint("shows", __name__, url_prefix = "/shows")
 
-# GET / (get all shows)
+# ========= GET ALL SHOWS =========
 @shows_bp.route("/", methods = ["GET"])
 def get_shows():
+    """Retrieve all shows from the database."""
     stmt = db.select(Show)
     shows_list = db.session.scalars(stmt)
     data = shows_schema.dump(shows_list)
@@ -29,9 +32,10 @@ def get_shows():
         return {"message": "No shows found. Please add a show to get started."}, 200
     return jsonify(data), 200
 
-# GET /id (get one show by id)
+# ========= GET ONE SHOW =========
 @shows_bp.route("/<int:show_id>", methods = ["GET"])
 def get_one_show(show_id):
+    """Retrieve a single show by its ID."""
     stmt = db.select(Show).where(Show.show_id == show_id)
     show = db.session.scalar(stmt)
     data = show_schema.dump(show)
@@ -40,35 +44,33 @@ def get_one_show(show_id):
     else:
         return {"message": f"Show with id {show_id} doesn't exist."}, 404
 
-# POST / (create a new show)
-"""venue_id is nullable to allow for pop-up events without a fixed venue.
-try/except block added to catch IntegrityError from UniqueConstraint on (event_id, venue_id, date_time)
-otherwise duplicate shows could be created."""
+# ========= CREATE NEW SHOW =========
 @shows_bp.route("/", methods=["POST"])
 def create_show():
-    """Create a new show. Checks for duplicates by event_id, date_time, and venue_id."""
+    """Create a new show. Prevents duplicates by event_id, date_time, and venue_id."""
     body_data = request.get_json()
-    try: # Load and validate via schema (handles date_time parsing)
-        new_show = show_schema.load(body_data, session=db.session)
-    except ValidationError as ve:
-        return {"message": ve.messages}, 400
+    new_show = show_schema.load(
+        body_data, 
+        session = db.session
+    )
 
-    duplicate = db.session.query(Show).filter( # Check for duplicate show
+    existing_show = db.session.query(Show).filter( # Check if show already exists for this event, date and venue
         Show.event_id == new_show.event_id,
         Show.date_time == new_show.date_time,
         Show.venue_id == new_show.venue_id
     ).first()
 
-    if duplicate:
+    if existing_show:
         return {"message": "A show for this event, date, and venue already exists."}, 409
 
     db.session.add(new_show)
     db.session.commit()
     return show_schema.dump(new_show), 201
 
-# PATCH/PUT /id (update show by id)
+# ========= UPDATE SHOW =========
 @shows_bp.route("/<int:show_id>", methods = ["PUT", "PATCH"])
 def update_show(show_id):
+    """Update existing show by its ID."""
     stmt = db.select(Show).where(Show.show_id == show_id)
     show = db.session.scalar(stmt)
     if not show:
@@ -89,12 +91,10 @@ def update_show(show_id):
             db.session.rollback()
             return {"message": str(err.orig) if getattr(err, 'orig', None) else str(err)}, 400
     
-# DELETE /id (cancel show by id)
-"""Shows are not deleted from the database to preserve historical/audit data.
-Instead, all associated bookings are cancelled."""
-
+# ========= CANCEL SHOW =========
 @shows_bp.route("/<int:show_id>", methods = ["DELETE"])
 def delete_show(show_id):
+    """Cancel a show by its ID. Cancels all associated bookings."""
     stmt = db.select(Show).where(Show.show_id == show_id)
     show = db.session.scalar(stmt)
     if not show:

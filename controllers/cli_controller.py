@@ -1,3 +1,13 @@
+"""Database custom CLI commands for creating, dropping, and seeding tables.
+Provides:
+    - `flask db drop`: Drop all database tables.
+    - `flask db create`: Create all database tables.
+    - `flask db seed`: Populate tables with initial sample data.
+
+Note:
+    - Foreign key dependencies are respected: TicketHolders → Organisers → Venues → Events → Shows → Bookings.
+"""
+
 from flask import Blueprint
 from datetime import datetime
 
@@ -12,19 +22,23 @@ from utils.constraints import DATETIME_DISPLAY_FORMAT
 
 db_commands = Blueprint("db", __name__)
 
-@db_commands.cli.command("create")
-def create_tables():
-    db.create_all()
-    print("Tables created.")
-
+# ======== CLI COMMANDS ========
 @db_commands.cli.command("drop")
 def drop_tables():
+    """Drop all database tables."""
     db.drop_all()
     print("Tables dropped.")
 
+@db_commands.cli.command("create")
+def create_tables():
+    """Create all database tables."""
+    db.create_all()
+    print("Tables created.")
+
 @db_commands.cli.command("seed")
 def seed_tables():
-    # ========== Seed TicketHolders ==========
+    """Seed database tables."""
+    # ========== SEED TICKET HOLDERS ==========
     ticket_holders = [TicketHolder(
         first_name = "Bobby",
         last_name = "Mac Manus",
@@ -50,7 +64,7 @@ def seed_tables():
     db.session.add_all(ticket_holders)
     db.session.commit()
 
-    # ========== Seed Organisers ==========
+    # ========== SEED ORGANISERS ==========
     organisers = [Organiser(
         full_name = "Johnnie Marks",
         email = "johnnie@email.com",
@@ -64,7 +78,7 @@ def seed_tables():
     db.session.add_all(organisers)
     db.session.commit()
 
-    # ========== Seed Venues ==========
+    # ========== SEED VENUES ==========
     venues = [Venue(
         name = "Rod Laver Arena",
         location = "200 Batman Ave, Melbourne VIC 3004",
@@ -78,7 +92,7 @@ def seed_tables():
     db.session.add_all(venues)
     db.session.commit()
 
-    # ========== Seed Events ==========
+    # ========== SEED EVENTS ==========
     events = [Event(
         title = "Linkin Park: From Zero World Tour",
         description = """The band will perform both new hits like “The Emptiness Machine” and “Heavy Is The Crown” alongside iconic anthems spanning their 20+ year career. Following the release of “Heavy Is The Crown”, the official League of Legends World Championship Anthem and their first collaboration with Riot Games, Linkin Park reasserted their position as one of rock’s defining voices. The song’s hard-hitting rhythm and anthemic energy embody the bold, renewed spirit of the band, resonating with fans across the globe and paving the way for From Zero.
@@ -102,7 +116,7 @@ When BADLANDS was first released on August 28, 2015, it catapulted Halsey into m
     db.session.add_all(events)
     db.session.commit()
 
-    # ========== Seed Shows ==========
+    # ========== SEED SHOWS ==========
     shows = [Show(
         date_time = datetime.strptime("8-3-2026 | 7:00 PM", DATETIME_DISPLAY_FORMAT),
         event_id = events[0].event_id,
@@ -128,7 +142,7 @@ When BADLANDS was first released on August 28, 2015, it catapulted Halsey into m
     db.session.add_all(shows)
     db.session.commit()
 
-    # ========== Seed Bookings ==========
+    # ========== SEED BOOKINGS ==========
     bookings = [Booking(
         booking_status = BookingStatus.CONFIRMED,
         section = Section.GENERAL_ADMISSION_STANDING,

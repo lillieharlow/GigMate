@@ -6,7 +6,9 @@ Handles all CRUD operations/logic for bookings:
     - Update an existing booking
     - Delete a booking
 
-Note: IntegrityError and ValidationError are handled globally in utils.error_handlers.
+Note:
+    - IntegrityError and ValidationError are handled globally in utils.error_handlers.
+    - Pagination is implemented for retrieving all bookings, 10 bookings per page.
 """
 
 from flask import Blueprint, jsonify, request
@@ -19,9 +21,10 @@ from schemas.schemas import booking_schema, bookings_schema
 
 bookings_bp = Blueprint("bookings", __name__, url_prefix = "/bookings")
 
-# GET / (get all bookings)
+# ======== GET ALL BOOKINGS ========
 @bookings_bp.route("/", methods=["GET"])
 def get_bookings():
+    """Retrieve all bookings with pagination."""
     page = int(request.args.get("page", 1))
     per_page = int(request.args.get("per_page", 10))
     bookings_list = Booking.query.paginate(page=page, per_page=per_page, error_out=False)
@@ -36,9 +39,10 @@ def get_bookings():
         "pages": bookings_list.pages
     }, 200
 
-# GET /id (get one booking by id)
+# ========= GET ONE BOOKING ========
 @bookings_bp.route("/<int:booking_id>", methods = ["GET"])
 def get_one_booking(booking_id):
+    """Retrieve one booking by ID."""
     stmt = db.select(Booking).where(Booking.booking_id == booking_id)
     booking = db.session.scalar(stmt)
     data = booking_schema.dump(booking)
@@ -47,9 +51,10 @@ def get_one_booking(booking_id):
     else:
         return {"message": f"Booking with id {booking_id} doesn't exist."}, 404
 
-# POST / (create a new booking)
+# ========= CREATE NEW BOOKING =========
 @bookings_bp.route("/", methods = ["POST"])
 def create_booking():
+    """Create a new booking."""
     body_data = request.get_json()
     new_booking = booking_schema.load(
         body_data,
@@ -59,9 +64,10 @@ def create_booking():
     db.session.commit()
     return booking_schema.dump(new_booking), 201
 
-# PATCH/PUT /id (update booking by id)
+# ========= UPDATE BOOKING =========
 @bookings_bp.route("/<int:booking_id>", methods = ["PUT", "PATCH"])
 def update_booking(booking_id):
+    """Update an existing booking by ID."""
     stmt = db.select(Booking).where(Booking.booking_id == booking_id)
     booking = db.session.scalar(stmt)
     if not booking:
@@ -82,9 +88,10 @@ def update_booking(booking_id):
             db.session.rollback()
             return {"message": str(err.orig) if getattr(err, 'orig', None) else str(err)}, 400
     
-# DELETE /id (delete booking by id)
+# ========= DELETE BOOKING =========
 @bookings_bp.route("/<int:booking_id>", methods = ["DELETE"])
 def delete_booking(booking_id):
+    """Delete a booking by ID."""
     stmt = db.select(Booking).where(Booking.booking_id == booking_id)
     booking = db.session.scalar(stmt)
     if booking:

@@ -6,7 +6,8 @@ Handles all CRUD operations/logic for venues:
     - Update an existing venue
     - Delete a venue
 
-Note: IntegrityError and ValidationError are handled globally in utils.error_handlers.
+Note:
+    - IntegrityError and ValidationError are handled globally in utils.error_handlers.
 """
 
 from flask import Blueprint, jsonify, request
@@ -19,9 +20,10 @@ from schemas.schemas import venue_schema, venues_schema
 
 venues_bp = Blueprint("venues", __name__, url_prefix = "/venues")
 
-# GET / (get all venues)
+# ========= GET ALL VENUES =========
 @venues_bp.route("/", methods = ["GET"])
 def get_venues():
+    """Retrieve all venues."""
     stmt = db.select(Venue)
     venues_list = db.session.scalars(stmt)
     data = venues_schema.dump(venues_list)
@@ -29,9 +31,10 @@ def get_venues():
         return {"message": "No venues found. Please add a venue to get started."}, 200
     return jsonify(data), 200
 
-# GET /id (get one venue by id)
+# ========= GET ONE VENUE =========
 @venues_bp.route("/<int:venue_id>", methods = ["GET"])
 def get_one_venue(venue_id):
+    """Retrieve one venue by ID."""
     stmt = db.select(Venue).where(Venue.venue_id == venue_id)
     venue = db.session.scalar(stmt)
     data = venue_schema.dump(venue)
@@ -39,10 +42,11 @@ def get_one_venue(venue_id):
         return jsonify(data), 200
     else:
         return {"message": f"Venue with id {venue_id} doesn't exist."}, 404
-    
-# POST / (create a new venue)
+
+# ========= CREATE NEW VENUE =========
 @venues_bp.route("/", methods = ["POST"])
 def create_venue():
+    """Create a new venue."""
     body_data = request.get_json()
     new_venue = venue_schema.load(
         body_data,
@@ -52,9 +56,10 @@ def create_venue():
     db.session.commit()
     return venue_schema.dump(new_venue), 201
 
-# PATCH/PUT /id (update venue by id)
+# ========= UPDATE VENUE =========
 @venues_bp.route("/<int:venue_id>", methods=["PUT", "PATCH"])
 def update_venue(venue_id):
+    """Update an existing venue by ID."""
     stmt = db.select(Venue).where(Venue.venue_id == venue_id)
     venue = db.session.scalar(stmt)
     if not venue:
@@ -73,10 +78,11 @@ def update_venue(venue_id):
     except IntegrityError as err:
         db.session.rollback()
         return {"message": str(err.orig) if getattr(err, 'orig', None) else str(err)}, 400
-    
-# DELETE /id (delete venue by id)
+
+# ========= DELETE VENUE =========
 @venues_bp.route("/<int:venue_id>", methods = ["DELETE"])
 def delete_venue(venue_id):
+    """Delete a venue by ID. Updates related shows to display 'Venue To Be Announced'."""
     stmt = db.select(Venue).where(Venue.venue_id == venue_id)
     venue = db.session.scalar(stmt)
     if venue:

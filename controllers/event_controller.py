@@ -6,7 +6,8 @@ Handles all CRUD operations/logic for events:
     - Update an existing event
     - Cancel an event (cancelling all associated bookings)
     
-Note: IntegrityError and ValidationError are handled globally in utils.error_handlers.
+Note:
+    - IntegrityError and ValidationError are handled globally in utils.error_handlers.
 """
 
 from flask import Blueprint, jsonify, request
@@ -21,9 +22,10 @@ from schemas.schemas import event_schema, events_schema
 
 events_bp = Blueprint("events", __name__, url_prefix = "/events")
 
-# GET / (get all events)
+# ========= GET ALL EVENTS =========
 @events_bp.route("/", methods = ["GET"])
 def get_events():
+    """Retrieve all events."""
     stmt = db.select(Event)
     events_list = db.session.scalars(stmt)
     data = events_schema.dump(events_list)
@@ -31,9 +33,10 @@ def get_events():
         return {"message": "No events found. Please add an event to get started."}, 200
     return jsonify(data), 200
 
-# GET /id (get one event by id)
+# ========= GET ONE EVENT =========
 @events_bp.route("/<int:event_id>", methods = ["GET"])
 def get_one_event(event_id):
+    """Retrieve one event by ID."""
     stmt = db.select(Event).where(Event.event_id == event_id)
     event = db.session.scalar(stmt)
     data = event_schema.dump(event)
@@ -42,9 +45,10 @@ def get_one_event(event_id):
     else:
         return {"message": f"Event with id {event_id} doesn't exist."}, 404
 
-# POST / (create a new event)
+# ========= CREATE NEW EVENT =========
 @events_bp.route("/", methods = ["POST"])
 def create_event():
+    """Create a new event."""
     body_data = request.get_json()
     new_event = event_schema.load(
         body_data,
@@ -54,9 +58,10 @@ def create_event():
     db.session.commit()
     return event_schema.dump(new_event), 201
 
-# PATCH/PUT /id (update event by id)
+# ========= UPDATE EVENT =========
 @events_bp.route("/<int:event_id>", methods = ["PUT", "PATCH"])
 def update_event(event_id):
+    """Update an existing event by ID."""
     stmt = db.select(Event).where(Event.event_id == event_id)
     event = db.session.scalar(stmt)
     if not event:
@@ -76,20 +81,17 @@ def update_event(event_id):
         except IntegrityError as err:
             db.session.rollback()
             return {"message": str(err.orig) if getattr(err, 'orig', None) else str(err)}, 400
-    
-# DELETE /id (cancel event by id)
-"""Events are not deleted from the database to preserve historical/audit data.
-Instead, all associated bookings are cancelled."""
 
+# ========= CANCEL EVENT =========
 @events_bp.route("/<int:event_id>", methods = ["DELETE"])
 def delete_event(event_id):
+    """Cancel an event by ID. Cancelling all associated shows and bookings."""
     stmt = db.select(Event).where(Event.event_id == event_id)
     event = db.session.scalar(stmt)
     if event:
         for show in event.shows:  # Cancel all shows for this event
             show.show_status = ShowStatus.CANCELLED
-            # Cancel all bookings for this show
-            for booking in show.bookings:
+            for booking in show.bookings:  # Cancel all bookings for this show
                 booking.booking_status = BookingStatus.CANCELLED
         
         db.session.commit()
