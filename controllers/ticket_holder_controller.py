@@ -29,7 +29,7 @@ def get_ticket_holders():
     ticket_holders_list = db.session.scalars(stmt)
     data = ticket_holders_schema.dump(ticket_holders_list)
     if not data:
-        return {"message": "No ticket holders found."}, 404
+        return {"message": "No ticket holders found."}, 200
     return jsonify(data), 200
 
 # GET /id (get one ticket holder by id)
@@ -45,7 +45,7 @@ def get_one_ticket_holder(ticket_holder_id):
 
 # POST / (create a new ticket holder)
 @ticket_holders_bp.route("/", methods = ["POST"])
-def create_a_ticket_holder():
+def create_ticket_holder():
     body_data = request.get_json()
     new_ticket_holder = ticket_holder_schema.load(
         body_data,
@@ -57,7 +57,7 @@ def create_a_ticket_holder():
 
 # PATCH/PUT /id (update ticket holder by id)
 @ticket_holders_bp.route("/<int:ticket_holder_id>", methods = ["PUT", "PATCH"])
-def update_a_ticket_holder(ticket_holder_id):
+def update_ticket_holder(ticket_holder_id):
     stmt = db.select(TicketHolder).where(TicketHolder.ticket_holder_id == ticket_holder_id)
     ticket_holder = db.session.scalar(stmt)
     if not ticket_holder:
@@ -80,7 +80,7 @@ def update_a_ticket_holder(ticket_holder_id):
     
 # DELETE /id (delete ticket holder by id)
 @ticket_holders_bp.route("/<int:ticket_holder_id>", methods = ["DELETE"])
-def delete_a_ticket_holder(ticket_holder_id):
+def delete_ticket_holder(ticket_holder_id):
     stmt = db.select(TicketHolder).where(TicketHolder.ticket_holder_id == ticket_holder_id)
     ticket_holder = db.session.scalar(stmt)
     if ticket_holder:

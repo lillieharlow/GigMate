@@ -28,7 +28,7 @@ def get_events():
     events_list = db.session.scalars(stmt)
     data = events_schema.dump(events_list)
     if not data:
-        return {"message": "No events found. Please add an event to get started."}, 404
+        return {"message": "No events found. Please add an event to get started."}, 200
     return jsonify(data), 200
 
 # GET /id (get one event by id)
@@ -44,7 +44,7 @@ def get_one_event(event_id):
 
 # POST / (create a new event)
 @events_bp.route("/", methods = ["POST"])
-def create_a_event():
+def create_event():
     body_data = request.get_json()
     new_event = event_schema.load(
         body_data,
@@ -56,7 +56,7 @@ def create_a_event():
 
 # PATCH/PUT /id (update event by id)
 @events_bp.route("/<int:event_id>", methods = ["PUT", "PATCH"])
-def update_a_event(event_id):
+def update_event(event_id):
     stmt = db.select(Event).where(Event.event_id == event_id)
     event = db.session.scalar(stmt)
     if not event:
@@ -82,7 +82,7 @@ def update_a_event(event_id):
 Instead, all associated bookings are cancelled."""
 
 @events_bp.route("/<int:event_id>", methods = ["DELETE"])
-def delete_a_event(event_id):
+def delete_event(event_id):
     stmt = db.select(Event).where(Event.event_id == event_id)
     event = db.session.scalar(stmt)
     if event:

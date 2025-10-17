@@ -27,7 +27,7 @@ def get_bookings():
     bookings_list = Booking.query.paginate(page=page, per_page=per_page, error_out=False)
     data = bookings_schema.dump(bookings_list.items)
     if not data:
-        return {"message": "No bookings found. Please add a booking to get started."}, 404
+        return {"message": "No bookings found. Please add a booking to get started."}, 200
     return {
         "bookings": data,
         "page": page,
@@ -49,7 +49,7 @@ def get_one_booking(booking_id):
 
 # POST / (create a new booking)
 @bookings_bp.route("/", methods = ["POST"])
-def create_a_booking():
+def create_booking():
     body_data = request.get_json()
     new_booking = booking_schema.load(
         body_data,
@@ -61,7 +61,7 @@ def create_a_booking():
 
 # PATCH/PUT /id (update booking by id)
 @bookings_bp.route("/<int:booking_id>", methods = ["PUT", "PATCH"])
-def update_a_booking(booking_id):
+def update_booking(booking_id):
     stmt = db.select(Booking).where(Booking.booking_id == booking_id)
     booking = db.session.scalar(stmt)
     if not booking:
@@ -84,7 +84,7 @@ def update_a_booking(booking_id):
     
 # DELETE /id (delete booking by id)
 @bookings_bp.route("/<int:booking_id>", methods = ["DELETE"])
-def delete_a_booking(booking_id):
+def delete_booking(booking_id):
     stmt = db.select(Booking).where(Booking.booking_id == booking_id)
     booking = db.session.scalar(stmt)
     if booking:

@@ -26,7 +26,7 @@ def get_venues():
     venues_list = db.session.scalars(stmt)
     data = venues_schema.dump(venues_list)
     if not data:
-        return {"message": "No venues found. Please add a venue to get started."}, 404
+        return {"message": "No venues found. Please add a venue to get started."}, 200
     return jsonify(data), 200
 
 # GET /id (get one venue by id)
@@ -42,7 +42,7 @@ def get_one_venue(venue_id):
     
 # POST / (create a new venue)
 @venues_bp.route("/", methods = ["POST"])
-def create_a_venue():
+def create_venue():
     body_data = request.get_json()
     new_venue = venue_schema.load(
         body_data,
@@ -54,7 +54,7 @@ def create_a_venue():
 
 # PATCH/PUT /id (update venue by id)
 @venues_bp.route("/<int:venue_id>", methods=["PUT", "PATCH"])
-def update_a_venue(venue_id):
+def update_venue(venue_id):
     stmt = db.select(Venue).where(Venue.venue_id == venue_id)
     venue = db.session.scalar(stmt)
     if not venue:
@@ -76,7 +76,7 @@ def update_a_venue(venue_id):
     
 # DELETE /id (delete venue by id)
 @venues_bp.route("/<int:venue_id>", methods = ["DELETE"])
-def delete_a_venue(venue_id):
+def delete_venue(venue_id):
     stmt = db.select(Venue).where(Venue.venue_id == venue_id)
     venue = db.session.scalar(stmt)
     if venue:

@@ -26,7 +26,7 @@ def get_organisers():
     organisers_list = db.session.scalars(stmt)
     data = organisers_schema.dump(organisers_list)
     if not data:
-        return {"message": "No organisers found."}, 404
+        return {"message": "No organisers found."}, 200
     return jsonify(data), 200
      
 # GET /id (get one organiser by id)
@@ -42,7 +42,7 @@ def get_one_organiser(organiser_id):
     
 # POST / (create a new organiser)
 @organisers_bp.route("/", methods = ["POST"])
-def create_a_organiser():
+def create_organiser():
     body_data = request.get_json()
     new_organiser = organiser_schema.load(
         body_data,
@@ -54,7 +54,7 @@ def create_a_organiser():
 
 # PATCH/PUT /id (update organiser by id)
 @organisers_bp.route("/<int:organiser_id>", methods = ["PUT", "PATCH"])
-def update_a_organiser(organiser_id):
+def update_organiser(organiser_id):
     stmt = db.select(Organiser).where(Organiser.organiser_id == organiser_id)
     organiser = db.session.scalar(stmt)
     if not organiser:
@@ -77,7 +77,7 @@ def update_a_organiser(organiser_id):
 
 # DELETE /id (delete organiser by id)
 @organisers_bp.route("/<int:organiser_id>", methods = ["DELETE"])
-def delete_a_organiser(organiser_id):
+def delete_organiser(organiser_id):
     stmt = db.select(Organiser).where(Organiser.organiser_id == organiser_id)
     organiser = db.session.scalar(stmt)
     if organiser:

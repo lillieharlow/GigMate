@@ -8,15 +8,13 @@ Handles all CRUD operations/logic for shows:
 
 Note: IntegrityError and ValidationError are handled globally in utils.error_handlers.
 """
-from datetime import datetime
-
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 from marshmallow import ValidationError
 
 from init import db
 from models.show import Show, ShowStatus
-from utils.constraints import BookingStatus, DATETIME_DISPLAY_FORMAT
+from utils.constraints import BookingStatus
 from schemas.schemas import show_schema, shows_schema
 
 shows_bp = Blueprint("shows", __name__, url_prefix = "/shows")
@@ -28,7 +26,7 @@ def get_shows():
     shows_list = db.session.scalars(stmt)
     data = shows_schema.dump(shows_list)
     if not data:
-        return {"message": "No shows found. Please add a show to get started."}, 404
+        return {"message": "No shows found. Please add a show to get started."}, 200
     return jsonify(data), 200
 
 # GET /id (get one show by id)
@@ -46,35 +44,31 @@ def get_one_show(show_id):
 """venue_id is nullable to allow for pop-up events without a fixed venue.
 try/except block added to catch IntegrityError from UniqueConstraint on (event_id, venue_id, date_time)
 otherwise duplicate shows could be created."""
-@shows_bp.route("/", methods = ["POST"])
-def create_a_show():
+@shows_bp.route("/", methods=["POST"])
+def create_show():
+    """Create a new show. Checks for duplicates by event_id, date_time, and venue_id."""
     body_data = request.get_json()
-    event_id = body_data.get("event_id")
-    date_time = body_data.get("date_time")
-    venue_id = body_data.get("venue_id")
-    try:
-        dt_obj = datetime.strptime(date_time, DATETIME_DISPLAY_FORMAT)
-    except Exception:
-        dt_obj = date_time  # fallback if already datetime
-    # Query for existing show
-    duplicate = db.session.query(Show).filter(
-        Show.event_id == event_id,
-        Show.date_time == dt_obj,
-        Show.venue_id == venue_id
+    try: # Load and validate via schema (handles date_time parsing)
+        new_show = show_schema.load(body_data, session=db.session)
+    except ValidationError as ve:
+        return {"message": ve.messages}, 400
+
+    duplicate = db.session.query(Show).filter( # Check for duplicate show
+        Show.event_id == new_show.event_id,
+        Show.date_time == new_show.date_time,
+        Show.venue_id == new_show.venue_id
     ).first()
+
     if duplicate:
-        return {"message": "A show for this event, date, and venue already exists"}, 409
-    new_show = show_schema.load(
-        body_data,
-        session = db.session
-    )
+        return {"message": "A show for this event, date, and venue already exists."}, 409
+
     db.session.add(new_show)
     db.session.commit()
     return show_schema.dump(new_show), 201
 
 # PATCH/PUT /id (update show by id)
 @shows_bp.route("/<int:show_id>", methods = ["PUT", "PATCH"])
-def update_a_show(show_id):
+def update_show(show_id):
     stmt = db.select(Show).where(Show.show_id == show_id)
     show = db.session.scalar(stmt)
     if not show:
@@ -100,7 +94,7 @@ def update_a_show(show_id):
 Instead, all associated bookings are cancelled."""
 
 @shows_bp.route("/<int:show_id>", methods = ["DELETE"])
-def delete_a_show(show_id):
+def delete_show(show_id):
     stmt = db.select(Show).where(Show.show_id == show_id)
     show = db.session.scalar(stmt)
     if not show:
