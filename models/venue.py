@@ -7,7 +7,7 @@ including constraints for capacity, name, and address formatting.
 from sqlalchemy import CheckConstraint
 
 from init import db
-from utils.constraints import name_regex, venue_location_regex
+from utils.constraints import venue_name_regex, venue_location_regex
 
 class Venue(db.Model):
     """Model for venues.
@@ -32,7 +32,7 @@ class Venue(db.Model):
     __table_args__ = (
         CheckConstraint("capacity >= 1", name='check_capacity_positive'),
         CheckConstraint("capacity <= 200000", name='check_capacity_realistic'), # Max realistic venue capacity
-        CheckConstraint(f"name ~ '{name_regex}'", name='check_name_format'),
+        CheckConstraint(f"name ~ '{venue_name_regex}'", name='check_name_format'),
         CheckConstraint(f"location ~ '{venue_location_regex}'", name='check_address_format'), # Validate Google Maps style address
     )
 
