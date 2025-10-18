@@ -10,6 +10,7 @@ all error responses follow a predictable format for frontend/API clients.
 """
 
 from flask import jsonify
+from flask.cli import NoAppException
 from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError, DataError, ProgrammingError, OperationalError
 from psycopg2 import errorcodes, OperationalError as P2OperationalError
@@ -27,7 +28,6 @@ def error_response(message, status_code, error_type="Error"):
 
 # ========== ERROR HANDLERS ==========
 def error_handlers(app):
-    from flask.cli import NoAppException
 
 # ========== NAME ERRORS ==========    
     @app.errorhandler(NoAppException)

@@ -132,7 +132,7 @@ but overall it’s looking really good and easy to understand."
 
 Actions taken:
 
-1. Get all endpoints ahev been changed to status code 200 - 200 OK with an empty list, best practice because it's not an error. the collection exists, it's just empty.
+1. Get all endpoints have been changed to status code 200 - 200 OK with an empty list, best practice because it's not an error. the collection exists, it's just empty.
 
 2. Changed route names for ease of flow, i.e. routes with excess wording have been changed from this e.g. `create_a_event` to `create_event`. this was done for all controllers.
 
