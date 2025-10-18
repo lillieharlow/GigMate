@@ -1,15 +1,17 @@
-PostgreSQL is a great choice for GigMate because it keeps data safe and accurate — the most important thing for a ticketing system. When many people try to book at the same time, PostgreSQL’s transaction system makes sure bookings don’t get lost or duplicated (so seats aren’t accidentally double-sold).
+**Why GigMate uses PostgreSQL**
 
-Why pick PostgreSQL for GigMate?
+- Reliable under load: PostgreSQL ensures data consistency with ACID transactions. This means bookings are safe and accurate, even when multiple users try to book at the same time.
 
-- Reliable under load: PostgreSQL uses ACID transactions and MVCC to keep data consistent when many users act at once. That means operations like creating and confirming bookings behave predictably even under concurrency.
-- Flexible data support: it handles traditional tables and also flexible fields via JSONB, so we can store structured booking data and optional metadata (like third-party IDs or tags) without redesigning the schema.
-- Powerful queries and analytics: SQL features like JOINs, window functions and CTEs make it easy to implement availability checks, reporting, and analytics.
-- Extensible and cost-effective: Postgres has useful extensions and is free/open-source, so GigMate can grow without upfront licensing costs.
+- Flexible yet structured: You can start with simple relational tables for users, events, and bookings, and later add more flexible fields if needed.
 
-In short: PostgreSQL gives GigMate the safety of a relational database (to protect bookings) combined with features that let the project grow and adapt.
+- Powerful queries: PostgreSQL supports JOINs, aggregations, and complex queries, making it easy to check availability, generate reports, and analyze data.
 
-SQL Databases Comparison
+- Cost-effective and extensible: It’s open-source and supports extensions, so GigMate can grow without licensing costs.
+
+In short: PostgreSQL keeps GigMate’s data safe, reliable, and ready to grow.
+<hr>
+
+**SQL Databases Comparison**
 
 | Feature | PostgreSQL | MySQL | MSSQL Server |
 |---|---:|---:|---:|
@@ -20,8 +22,9 @@ SQL Databases Comparison
 | Cost & Licensing | Open-source, free | Open-source | Commercial (paid) |
 
 PostgreSQL offers expressive queries, robust constraints, flexible JSON support, and no licensing costs, providing strong community backing and a feature-rich platform for both today’s and tomorrow’s needs.
+<hr>
 
-NoSQL Databases Comparison
+**NoSQL Databases Comparison**
 
 | Feature | PostgreSQL (JSONB) | MongoDB | Cassandra |
 |---|---:|---:|---:|
@@ -30,6 +33,7 @@ NoSQL Databases Comparison
 | Querying | SQL + JSON operators | Aggregation framework | CQL (limited joins) |
 | Scaling | Vertical + replicas; sharding options | Horizontally scalable | Highly distributed / horizontal |
 
-While MongoDB or Cassandra are good for scale and flexibility with unstructured data, they usually trade off strong consistency—important for bookings where overselling must never occur. PostgreSQL offers a blend of relational control with JSON flexibility, robust enough for a booking system like GigMate.
+While MongoDB or Cassandra are good for scale and unstructured data, they trade off strong consistency. Important for bookings where overselling must never occur. PostgreSQL offers a blend of relational control with JSON flexibility, robust enough for a booking system like GigMate.
+<hr>
 
-PostgreSQL’s mix of power, reliability, extensibility, and no-cost open-source licensing make it the top choice for GigMate’s structured, integrity-driven event platform. It excels at preventing booking errors, supports analytics, and can grow with future requirements—all without the cost or limitations of many alternatives.
+PostgreSQL’s reliability, extensibility, analytics power, and free licensing make it the top choice for GigMate. It prevents booking errors, supports reporting, and can scale with the platform’s future needs.

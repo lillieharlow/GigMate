@@ -67,7 +67,7 @@ Checked by: Adam Nuttal (Senior Front End Web Dev)
 
 Document checked: ```Relational ERD``` & GigMate Repo - https://github.com/lillieharlow/GigMate
 
-<img src="images/ERD2.png" alt="ERD 2: First ERD for feedback" width="300">
+<img src="images/ERD2.png" alt="ERD 2: Second ERD for feedback" width="300">
 
 Feedback:
 
@@ -97,6 +97,8 @@ Checked by: Joshua Duong
 
 Document checked: ```Relational ERD``` & GigMate Repo - https://github.com/lillieharlow/GigMate
 
+<img src="images/ERD_FINAL.png" alt="Final ERD for GigMate" width="300">
+
 Feedback:
 
 "That's a lot to unpack and well done on the assignment!! It looks very good so I have very little in terms of feedback to give.
@@ -114,6 +116,8 @@ Date: 17th October 2025
 Checked by: Matt Vete
 
 Document checked: ```Relational ERD``` & GigMate Repo - https://github.com/lillieharlow/GigMate
+
+<img src="images/ERD_FINAL.png" alt="Final ERD for GigMate" width="300">
 
 Feedback:
 
