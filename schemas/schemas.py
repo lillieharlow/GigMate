@@ -466,7 +466,7 @@ Post-dump:
     @pre_load
     def reject_manual_booking_date(self, data, **kwargs):
         if "booking_date" in data:
-            raise ValidationError({"booking_date": ["Booking dates are automatic, do notset booking_date manually."]})
+            raise ValidationError({"booking_date": ["Booking dates are automatic, do not set booking_date manually."]})
         return data
     
 booking_schema = BookingSchema()
