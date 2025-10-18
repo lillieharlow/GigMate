@@ -1,7 +1,5 @@
 # GigMate
 
-**Tech Stack:** Python · Flask · PostgreSQL · SQLAlchemy · Marshmallow
-
 Rock Your Music Events with Ease. GigMate is your backstage pass to managing music tours, venues, organisers, and ticket bookings - all through a powerful RESTful API.
 
 From underground gigs to sold-out stadiums - GigMate keeps your tour in tune, your shows scheduled, and your fans hyped.
@@ -9,6 +7,9 @@ From underground gigs to sold-out stadiums - GigMate keeps your tour in tune, yo
 Plan. Book. Sell out. Repeat.
 
 Built for developers who want a clean, reliable backend for music events.
+<hr>
+
+**Tech Stack:** Python · Flask · PostgreSQL · SQLAlchemy · Marshmallow
 <hr>
 
 ## Target Audience / User Stories
