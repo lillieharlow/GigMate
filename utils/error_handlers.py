@@ -1,4 +1,5 @@
-"""Centralized error handling for the GigMate RESTful API.
+"""
+Centralized error handling for the GigMate RESTful API.
 
 This module registers global error handlers for common exceptions raised 
 across the Flask application — including validation errors, database integrity 
@@ -14,16 +15,35 @@ from sqlalchemy.exc import IntegrityError, DataError, ProgrammingError, Operatio
 from psycopg2 import errorcodes, OperationalError as P2OperationalError
 
 
+# ========== STANDARDIZED ERROR RESPONSE ==========
+def error_response(message, status_code, error_type="Error"):
+    return jsonify({
+        "error": {
+            "type": error_type,
+            "message": message,
+            "status": status_code
+        }
+    }), status_code
+
+# ========== ERROR HANDLERS ==========
 def error_handlers(app):
-    # Helper function for consistent error schema
-    def error_response(message, status_code, error_type="Error"):
-        return jsonify({
-            "error": {
-                "type": error_type,
-                "message": message,
-                "status": status_code
-            }
-        }), status_code
+    from flask.cli import NoAppException
+
+# ========== NAME ERRORS ==========    
+    @app.errorhandler(NoAppException)
+    def handle_no_app_exception(err):
+        return {
+            "message": (
+                "Flask could not find or import your app. Please check your FLASK_APP setting "
+                "and ensure your main application file and imports are correct."
+            )
+        }, 500
+
+    @app.errorhandler(NameError)
+    def handle_name_error(err):
+        return {
+            "message": f"Name error: {str(err)}. This usually means a variable or import is missing or misspelled."
+        }, 500
 
 # ========== VALIDATION ERRORS ==========
     @app.errorhandler(ValidationError)
@@ -53,7 +73,7 @@ def error_handlers(app):
                 return error_response(f"This item cannot be duplicated. {detail}", 409, "IntegrityError")
             if code == errorcodes.FOREIGN_KEY_VIOLATION:
                 return error_response(
-                    "A referenced value does not exist. Please check that all foreign key IDs (venue, event, organiser, etc.) are valid.",
+                    "A referenced value does not exist. Please check that all foreign key IDs are valid.",
                     409,
                     "ForeignKeyViolation"
                 )
@@ -109,7 +129,12 @@ def error_handlers(app):
 
     @app.errorhandler(KeyError)
     def handle_key_error(err):
-        return error_response(f"Missing required field: {str(err)}. Please check your request data.", 400, "KeyError")
+        missing_key = str(err).strip("'\"")
+        return error_response(
+            f"Missing required field: '{missing_key}'. Please check your request data and ensure all required fields are present.",
+            400,
+            "KeyError"
+        )
 
     @app.errorhandler(ValueError)
     def handle_value_error(err):
@@ -129,7 +154,7 @@ def error_handlers(app):
     def handle_method_not_allowed(err):
         return error_response("Method not allowed. Please check the HTTP method.", 405, "MethodNotAllowed")
 
-#========== SERVER ERRORS ==========
+# ========== SERVER ERRORS ==========
     @app.errorhandler(ConnectionError)
     def handle_connection_error(err):
         return error_response("Database connection error. Please check your database and network connection.", 500, "ConnectionError")
@@ -138,6 +163,7 @@ def error_handlers(app):
     def handle_server_error(err):
         return error_response("Server error occurred. Please try again later.", 500, "ServerError")
 
+# ========== UNEXPECTED / FALLBACK ==========
     @app.errorhandler(Exception)
     def handle_uncaught_exception(err):
         return error_response("An unexpected error occurred. Please try again later or contact support.", 500, "UnexpectedError")

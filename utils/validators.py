@@ -9,8 +9,9 @@ from .constraints import (
     phone_regex, phone_validation_error, 
     email_regex, email_validation_error,
     name_regex, name_validation_error,
-    venue_title_regex, venue_title_validation_error,
-    venue_location_regex, venue_location_validation_error
+    venue_name_regex, venue_name_validation_error,
+    venue_location_regex, venue_location_validation_error,
+    seat_number_regex, seat_number_validation_error
 )
 
 # ========== Email validation (length + regex) ==========
@@ -21,7 +22,6 @@ email_validators = [
 
 # ========== Phone validation (length + regex) ==========
 phone_validators = [
-    validate.Length(min = 10, max = 15, error = "Phone number must be 10-15 digits"),
     validate.Regexp(phone_regex, error = phone_validation_error)
 ]
 
@@ -41,13 +41,18 @@ full_name_validators = [
     validate.Regexp(name_regex, error = name_validation_error)
 ]
 
-# ========== Venue title and location validation ==========
-venue_title_validators = [
+# ========== Venue name and location validation ==========
+venue_name_validators = [
     validate.Length(min = 2, max = 30, error = "Venue name must be 2-30 characters"),
-    validate.Regexp(venue_title_regex, error = venue_title_validation_error)
+    validate.Regexp(venue_name_regex, error = venue_name_validation_error)
 ]
 
 venue_location_validators = [
     validate.Length(min = 10, max = 200, error = "Location must be 10-200 characters"),
     validate.Regexp(venue_location_regex, error = venue_location_validation_error)
+]
+
+# ========== Seat number validation ==========
+seat_number_validators = [
+    validate.Regexp(seat_number_regex, error = seat_number_validation_error)
 ]

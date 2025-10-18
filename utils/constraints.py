@@ -1,5 +1,4 @@
-"""
-Utility module for common constraints and validation patterns used across models and schemas.
+"""Utility module for common constraints and validation patterns used across models and schemas.
 
 Centralizes enums, regex patterns, and date/time formats to maintain consistency,
 reusability, maintainability, and scalability in data validation across the API.
@@ -30,8 +29,8 @@ DATE_DISPLAY_FORMAT = "%d-%m-%Y"  # e.g., "15-10-2025"
 DATETIME_VALIDATION_ERROR = 'Please format Date and time: DD-MM-YYYY | HH:MM AM/PM (e.g., "15-10-2025 | 08:30 PM")'
 
 # Phone regex for phone number validation
-phone_regex = r'^\+?[0-9]{10,15}$'
-phone_validation_error = "Phone number must contain 10-15 digits, area code '+' accepted."
+phone_regex = r'^\+\d{10,15}$|^\d{10,15}$'
+phone_validation_error = "Phone number must be 10-15 digits, with optional leading '+'. Example: '+61412345678' or '0412345678'."
 
 # Email regex for email validation
 email_regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
@@ -41,9 +40,9 @@ email_validation_error = "Invalid email format. Expected name@domain.com"
 name_regex = r"^[A-Za-z]([A-Za-z\s\-''\.]*[A-Za-z])?$"
 name_validation_error = "Name only accepts letters, spaces, hyphens, and apostrophes. Can't be just whitespace or contain any numbers."
 
-# Venue title regex - allows letters, numbers, spaces, hyphens, apostrophes, ampersands
-venue_title_regex = r"^[A-Za-z0-9]([A-Za-z0-9\s\-''\.&]*[A-Za-z0-9])?$"
-venue_title_validation_error = "Venue title can only contain letters, numbers, spaces, hyphens, apostrophes, and ampersands."
+# Venue name regex - allows letters, numbers, spaces, hyphens, apostrophes, ampersands
+venue_name_regex = r"^[A-Za-z0-9]([A-Za-z0-9\s\-''\.&]*[A-Za-z0-9])?$"
+venue_name_validation_error = "Venue name can only contain letters, numbers, spaces, hyphens, apostrophes, and ampersands."
 
 # Venue location regex for Google Maps style validation - optional street number, location name, suburb, state, postcode
 venue_location_regex = r"^([0-9]+[A-Za-z]?\s+)?[A-Za-z\s\-''\.]+,\s*[A-Za-z\s\-''\.]+\s+[A-Z]{2,3}\s+[0-9]{4}$"
