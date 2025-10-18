@@ -24,7 +24,7 @@ class Show(db.Model):
         bookings (list[Booking]): List of bookings associated with this show.
 
     Constraints:
-        - Each venue can only have one show at a given date_time.
+        - Each venue can only have one show per day.
         - Shows must be scheduled in the future.
 
     Relationships and delete behavior:
