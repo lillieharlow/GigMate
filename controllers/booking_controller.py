@@ -17,7 +17,7 @@ from marshmallow import ValidationError
 
 from init import db
 from models.booking import Booking
-from schemas.schemas import booking_schema, bookings_schema
+from schemas.booking_schema import booking_schema, bookings_schema
 
 bookings_bp = Blueprint("bookings", __name__, url_prefix = "/bookings")
 

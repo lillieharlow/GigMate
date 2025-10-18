@@ -20,7 +20,7 @@ from marshmallow import ValidationError
 from init import db
 from models.ticket_holder import TicketHolder
 from models.booking import BookingStatus
-from schemas.schemas import ticket_holder_schema, ticket_holders_schema
+from schemas.ticket_holder_schema import ticket_holder_schema, ticket_holders_schema
 
 ticket_holders_bp = Blueprint("ticket_holders", __name__, url_prefix = "/ticket_holders")
 

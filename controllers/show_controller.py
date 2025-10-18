@@ -17,7 +17,7 @@ from marshmallow import ValidationError
 from init import db
 from models.show import Show, ShowStatus
 from utils.constraints import BookingStatus
-from schemas.schemas import show_schema, shows_schema
+from schemas.show_schema import show_schema, shows_schema
 
 shows_bp = Blueprint("shows", __name__, url_prefix = "/shows")
 

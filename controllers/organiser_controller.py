@@ -16,7 +16,7 @@ from marshmallow import ValidationError
 
 from init import db
 from models.organiser import Organiser
-from schemas.schemas import organiser_schema, organisers_schema
+from schemas.organiser_schema import organiser_schema, organisers_schema
 
 organisers_bp = Blueprint("organisers", __name__, url_prefix = "/organisers")
 

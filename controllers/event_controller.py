@@ -18,7 +18,7 @@ from init import db
 from models.event import Event
 from models.show import ShowStatus
 from utils.constraints import BookingStatus
-from schemas.schemas import event_schema, events_schema
+from schemas.event_schema import event_schema, events_schema
 
 events_bp = Blueprint("events", __name__, url_prefix = "/events")
 
