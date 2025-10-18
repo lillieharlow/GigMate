@@ -34,10 +34,6 @@ class Booking(db.Model):
         - Deleting a Show is restricted (show_id in bookings must remain valid).
     """
     __tablename__ = "bookings"
-    __table_args__ = (
-        UniqueConstraint("ticket_holder_id", "show_id", name = "booking_unique_ticket_holder_show"),
-        UniqueConstraint("show_id", "seat_number", name = "unique_seat_per_show"), # Enforce seat uniqueness when seat_number is not null
-    )
 
     booking_id = db.Column(db.Integer, primary_key = True)
     booking_date = db.Column(db.Date, default = func.current_date(), nullable = False)  # Default to current date
@@ -46,6 +42,11 @@ class Booking(db.Model):
     seat_number = db.Column(db.String(4), nullable = True)
     ticket_holder_id = db.Column(db.Integer, db.ForeignKey("ticket_holders.ticket_holder_id", ondelete="RESTRICT"), nullable = False)
     show_id = db.Column(db.Integer, db.ForeignKey("shows.show_id", ondelete="RESTRICT"), nullable = False)
+
+    __table_args__ = (
+        UniqueConstraint("ticket_holder_id", "show_id", name = "booking_unique_ticket_holder_show"),
+        UniqueConstraint("show_id", "seat_number", name = "unique_seat_per_show"), # Enforce seat uniqueness when seat_number is not null
+    )
 
     ticket_holder = db.relationship("TicketHolder", back_populates = "bookings")
     show = db.relationship("Show", back_populates = "bookings")

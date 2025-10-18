@@ -31,16 +31,18 @@ class TicketHolder(db.Model):
         - Ticket holders cannot be deleted if they have future confirmed bookings.
     """
     __tablename__ = "ticket_holders"
+    
+    ticket_holder_id = db.Column(db.Integer, primary_key = True)
+    first_name = db.Column(db.String(20), nullable = False)
+    last_name = db.Column(db.String(30), nullable = False)
+    email = db.Column(db.String(100), nullable = False, unique = True)
+    phone_number = db.Column(db.String(15), nullable = False, unique = True)
+
     __table_args__ = (
         CheckConstraint(f"email ~ '{email_regex}'", name = 'check_email_format'),
         CheckConstraint(f"phone_number ~ '{phone_regex}'", name = 'check_phone_format'),
         CheckConstraint(f"first_name ~ '{name_regex}'", name = 'check_first_name_format'),
         CheckConstraint(f"last_name ~ '{name_regex}'", name = 'check_last_name_format'),
     )
-    ticket_holder_id = db.Column(db.Integer, primary_key = True)
-    first_name = db.Column(db.String(20), nullable = False)
-    last_name = db.Column(db.String(30), nullable = False)
-    email = db.Column(db.String(100), nullable = False, unique = True)
-    phone_number = db.Column(db.String(15), nullable = False, unique = True)
 
     bookings = db.relationship("Booking", back_populates = "ticket_holder")

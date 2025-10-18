@@ -30,17 +30,18 @@ class Event(db.Model):
         - Each event can have multiple shows; deleting an event deletes all its shows.
     """
     __tablename__ = "events"
-    __table_args__ = (
-        CheckConstraint("duration_hours >= 1", name = 'check_duration_min'),
-        CheckConstraint("duration_hours <= 12", name = 'check_duration_max'),
-        UniqueConstraint('title', 'description', name = 'unique_event_content'),
-    )
 
     event_id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100), nullable = False)
     description = db.Column(db.Text, nullable = False)
     duration_hours = db.Column(db.Float, nullable = False)
     organiser_id = db.Column(db.Integer, db.ForeignKey("organisers.organiser_id", ondelete = "SET NULL"), nullable = True)
+    
+    __table_args__ = (
+        CheckConstraint("duration_hours >= 1", name = 'check_duration_min'),
+        CheckConstraint("duration_hours <= 12", name = 'check_duration_max'),
+        UniqueConstraint('title', 'description', name = 'unique_event_content'),
+    )
     
     organiser = db.relationship("Organiser", back_populates = "events")
     shows = db.relationship("Show", back_populates = "event", cascade = "all, delete-orphan")

@@ -36,16 +36,17 @@ class Show(db.Model):
         - Deleting a show leaves bookings intact (show_id in bookings remains valid and booking_status is updated to CANCELLED).
     """
     __tablename__ = "shows"
-    __table_args__ = (
-        UniqueConstraint('venue_id', 'date_time', name='unique_show_occurrence'),
-        CheckConstraint("date_time > CURRENT_TIMESTAMP", name='check_future_show')
-    )
 
     show_id = db.Column(db.Integer, primary_key = True)
     date_time = db.Column(db.DateTime, nullable = False)
     show_status = db.Column(Enum(ShowStatus), nullable = False, default = ShowStatus.CONFIRMED)
     event_id = db.Column(db.Integer, db.ForeignKey("events.event_id", ondelete = "CASCADE"), nullable = False)
     venue_id = db.Column(db.Integer, db.ForeignKey("venues.venue_id", ondelete = "SET NULL"), nullable = True)
+    
+    __table_args__ = (
+        UniqueConstraint('venue_id', 'date_time', name='unique_show_occurrence'),
+        CheckConstraint("date_time > CURRENT_TIMESTAMP", name='check_future_show')
+    )
     
     event = db.relationship("Event", back_populates = "shows")
     venue = db.relationship("Venue", back_populates = "shows")

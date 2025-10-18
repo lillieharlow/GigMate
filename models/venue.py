@@ -29,16 +29,17 @@ class Venue(db.Model):
         - Deleting a venue sets venue_id to NULL on associated shows and assigns a placeholder 'Venue To Be Announced'.
     """
     __tablename__ = "venues"
+
+    venue_id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(30), nullable = False, unique = True)
+    location = db.Column(db.String(100), nullable = False)
+    capacity = db.Column(db.Integer, nullable = False)
+
     __table_args__ = (
         CheckConstraint("capacity >= 1", name='check_capacity_positive'),
         CheckConstraint("capacity <= 200000", name='check_capacity_realistic'), # Max realistic venue capacity
         CheckConstraint(f"name ~ '{venue_name_regex}'", name='check_name_format'),
         CheckConstraint(f"location ~ '{venue_location_regex}'", name='check_address_format'), # Validate Google Maps style address
     )
-
-    venue_id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(30), nullable = False, unique = True)
-    location = db.Column(db.String(100), nullable = False)
-    capacity = db.Column(db.Integer, nullable = False)
 
     shows = db.relationship("Show", back_populates = "venue")

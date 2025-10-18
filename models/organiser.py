@@ -30,14 +30,16 @@ class Organiser(db.Model):
         - Deleting an organiser sets organiser_id to NULL on their events.
     """
     __tablename__ = "organisers"
+    
+    organiser_id = db.Column(db.Integer, primary_key = True)
+    full_name = db.Column(db.String(50), nullable = False)
+    email = db.Column(db.String(100), nullable = False, unique = True)
+    phone_number = db.Column(db.String(15), nullable = False, unique = True)
+
     __table_args__ = (
         CheckConstraint(f"full_name ~ '{name_regex}'", name = 'check_full_name_format'),
         CheckConstraint(f"email ~ '{email_regex}'", name = 'check_email_format'),
         CheckConstraint(f"phone_number ~ '{phone_regex}'", name = 'check_phone_format')
     )
-    organiser_id = db.Column(db.Integer, primary_key = True)
-    full_name = db.Column(db.String(50), nullable = False)
-    email = db.Column(db.String(100), nullable = False, unique = True)
-    phone_number = db.Column(db.String(15), nullable = False, unique = True)
 
     events = db.relationship("Event", back_populates = "organiser", passive_deletes=True)
