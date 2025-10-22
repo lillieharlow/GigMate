@@ -9,6 +9,8 @@ Plan. Book. Sell out. Repeat.
 Built for developers who want a clean, reliable backend for music events.
 <hr>
 
+API available at: **[gigmate.rocks](https://gigmate.rocks/)**
+
 **Tech Stack:** Python · Flask · PostgreSQL · SQLAlchemy · Marshmallow
 <hr>
 
@@ -71,13 +73,12 @@ Who’s GigMate For?
 GigMate runs on macOS, Linux and Windows (WSL). For development, Python 3.8+ is recommended.
 
 ### **Quick Start**
-   ```bash
-   git clone https://github.com/lillieharlow/GigMate.git
-   cd GigMate
-   python3 -m venv .venv && source .venv/bin/activate
-   pip install -r requirements.txt
-   flask run
-   ```
+1. Clone the repo and enter the directory.
+2. Create and activate a virtual environment.
+3. Install dependencies with `pip install -r requirements.txt`.
+4. Run the app with `flask run`.
+
+Scroll below for detailed instructions.
 
 ### **System Requirements**
    - **Python:** 3.8 or newer
@@ -114,25 +115,20 @@ GigMate runs on macOS, Linux and Windows (WSL). For development, Python 3.8+ is 
    ```
 
 ### **Set Up PostgreSQL**
-    Open PostgreSQL shell:
-    - macOS:
-       ```bash
-       psql
-       ```
-    - Linux/WSL:
-       ```bash
-       sudo -u postgres psql
-       ```
-    - Windows:
-       - Use pgAdmin (GUI) or open the PostgreSQL shell from the Start Menu, or:
-       ```bash
-       psql -U postgres
-       ```
-    Create database (if needed):
-    ```sql
-    CREATE DATABASE database_name;
-    \c database_name;
-    ```
+   Open PostgreSQL shell:
+   ```bash
+   # macOS:
+   psql
+   # Linux/WSL:
+   sudo -u postgres psql
+   # Windows:
+   psql -U postgres
+   ```
+   Create database (if needed):
+   ```sql
+   CREATE DATABASE database_name;
+   \c database_name;
+   ```
 
 ### Create User & Grant Permissions
    ```sql
@@ -162,9 +158,6 @@ Run the server:
 ```bash
 flask run
 ```
-
-API available at: **http://127.0.0.1:5000**
-
 <hr>
 
 ## Hardware Requirements
