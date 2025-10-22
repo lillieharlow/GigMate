@@ -162,6 +162,10 @@ def error_handlers(app):
     @app.errorhandler(500)
     def handle_server_error(err):
         return error_response("Server error occurred. Please try again later.", 500, "ServerError")
+    
+    @app.errorhandler(502)
+    def handle_bad_gateway(err):
+        return error_response("Bad gateway. The server received an invalid response, please try again soon.", 502, "BadGateway")
 
 # ========== UNEXPECTED / FALLBACK ==========
     @app.errorhandler(Exception)
